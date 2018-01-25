@@ -5,7 +5,7 @@
 #include <ctime>
 #include <cstdlib>
 
-double ekrany=sf::VideoMode::getDesktopMode().height,ekranx=sf::VideoMode::getDesktopMode().width;
+double ekranx=sf::VideoMode::getDesktopMode().width,ekrany=sf::VideoMode::getDesktopMode().height;
 //double ekranx=1600,ekrany=900;
 
 class Protagonista
@@ -17,19 +17,50 @@ public:
 };
 void Protagonista::rysuj(int x,int y)
 {
-    tpc.loadFromFile("x.png");
+    tpc.loadFromFile("palk4.png");
     pc.setTexture(tpc);
-    pc.setScale(ekranx/1600,ekrany/900);
-    pc.setPosition(x*100,y*100);
-    pc.setOrigin(50,100);
     pc.setTextureRect(sf::IntRect(0,0, 100,100));
+    pc.setScale(ekranx/1600,ekrany/900);
+    pc.setPosition(x*100*ekranx/1600,y*100*ekrany/900);
+    pc.setOrigin(50,100);
+}
+
+class Mapa
+{
+public:
+    sf::Texture tpodloga;
+    sf::Sprite podloga;
+    sf::Texture tsciana;
+    sf::Sprite sciana;
+    int i;
+    void rysuj(int x,int y,int t);
+};
+void Mapa::rysuj(int x,int y,int t)
+{
+    switch(t)
+    {
+    case 1:
+        i=rand()%2;
+        tpodloga.loadFromFile("trawa.png");
+        podloga.setTextureRect(sf::IntRect(i*100,0, (i+1)*100,100));
+        break;
+    case 2:
+        tpodloga.loadFromFile("wall.png");
+        break;
+    default:
+        tpodloga.loadFromFile("trawa1.png");
+        break;
+    }
+    podloga.setTexture(tpodloga);
+    podloga.setScale(ekranx/1600,ekrany/900);
+    podloga.setPosition(x*100*ekranx/1600,y*100*ekrany/900);
 }
 
 int main()
 {
     Protagonista gracz;
+    Mapa siatka[144];
 
-    srand(time(NULL));
     sf::Vector2i mysz;
     sf::Vector2f pozycja;
     sf::Event event;
@@ -38,7 +69,13 @@ int main()
     int klatki=0;
     double rup=0,rdown=0,rright=0,rleft=0,k=0;
 
-    gracz.rysuj(2,1);
+    gracz.rysuj(3,2);
+    for(int i=0; i<16; i++)
+        for(int j=1; j<9; j++)
+            siatka[j*16+i].rysuj(i,j,1);
+    for(int i=0;i<16;i++)
+        siatka[i].rysuj(i,0,2);
+
 
     sf::ContextSettings settings;
     settings.antialiasingLevel=16;
@@ -78,6 +115,8 @@ int main()
                 gracz.pc.move(-rleft,0);
         }
         okno.clear(sf::Color::Black);
+        for(int i=0; i<144; i++)
+            okno.draw(siatka[i].podloga);
         okno.draw(gracz.pc);
         okno.display();
     }
