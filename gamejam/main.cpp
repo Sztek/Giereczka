@@ -5,6 +5,9 @@
 #include <ctime>
 #include <cstdlib>
 
+double ekrany=sf::VideoMode::getDesktopMode().height,ekranx=sf::VideoMode::getDesktopMode().width;
+//double ekranx=1600,ekrany=900;
+
 class Protagonista
 {
 public:
@@ -16,27 +19,28 @@ void Protagonista::rysuj(int x,int y)
 {
     tpc.loadFromFile("box.png");
     pc.setTexture(tpc);
-    pc.setPosition(x,y);
+    pc.setScale(ekranx/1600,ekrany/900);
+    pc.setPosition(x*100,y*100);
 }
 
 int main()
 {
     Protagonista gracz;
+
     srand(time(NULL));
-    int ekrany=sf::VideoMode::getDesktopMode().height,ekranx=sf::VideoMode::getDesktopMode().width;
     sf::Event event;
     sf::Clock clock;
-    double czas=0,klatka=0.03f;
+    double nowyczas=0,staryczas=0,klatka=0.03f;
     int klatki=0;
 
-    gracz.rysuj(0,0);
+    gracz.rysuj(2,1);
 
     sf::ContextSettings settings;
     settings.antialiasingLevel=16;
     sf::RenderWindow okno(sf::VideoMode(ekranx,ekrany),":v",sf::Style::Fullscreen,settings);
     while(okno.isOpen())
     {
-        czas+=clock.restart().asSeconds();
+        nowyczas+=clock.restart().asSeconds();
         while(okno.pollEvent(event))
         {
             if(event.type==sf::Event::Closed)
@@ -44,10 +48,11 @@ int main()
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
                 okno.close();
         }
-        if(czas>klatka)
+        if(nowyczas-staryczas>=klatka)
         {
-            czas-=klatka;
+            staryczas=nowyczas;
             klatki++;
+            std::cout<<klatki<<std::endl;
         }
         okno.clear(sf::Color::Black);
         okno.draw(gracz.pc);
