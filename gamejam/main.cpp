@@ -5,6 +5,8 @@
 #include <windows.h>
 #include <ctime>
 #include <cstdlib>
+#include <cstdio>
+#include <vector>
 
 double ekranx=sf::VideoMode::getDesktopMode().width,ekrany=sf::VideoMode::getDesktopMode().height;
 double skalax=ekranx/1600,skalay=ekrany/900;
@@ -18,7 +20,7 @@ public:
 };
 void Protagonista::rysuj(int x,int y)
 {
-    tpc.loadFromFile("palk14.png");
+    tpc.loadFromFile("palk44.png");
     pc.setTexture(tpc);
     pc.setTextureRect(sf::IntRect(100,0, 100,100));
     pc.setScale(skalax,skalay);
@@ -66,27 +68,24 @@ int main()
     music.setVolume(20);
     music.setLoop(true);
     music.openFromFile("riff_3.ogg");
-    music.play();
+    //music.play();
 
     Protagonista gracz;         //klasy
-    Mapa siatka[144];
+    Mapa siatka[2304];
 
-    sf::Vector2i mysz;          //deklaracje
+    sf::Vector2i mysz,kursor;          //deklaracje
     sf::Vector2f pozycja,wall;
     sf::Event event;
     sf::Clock clock;
     double nowyczas=0,staryczas=0,klatka=0.015f;
     int klatki=0;
     double rup=0,rdown=0,rright=0,rleft=0,k=0;
-    bool kolgora=false,koldol=false,kolprawo=false,kollewo=false;
+    bool kolgora=false,koldol=false,kolprawo=false,kollewo=false,reached;
 
     gracz.rysuj(3,2);           //rysowanko
-    for(int i=0; i<16; i++)
-        for(int j=1; j<9; j++)
-            siatka[j*16+i].rysuj(i,j,1);
-    for(int i=0; i<16; i++)
-        siatka[i].rysuj(i,0,2);
-    siatka[5].rysuj(1,1,1);
+    for(int i=0; i<64; i++)
+        for(int j=0; j<36; j++)
+            siatka[i*36+j].rysuj(i,j,1);
 
     sf::ContextSettings settings;
     settings.antialiasingLevel=16;
@@ -95,6 +94,7 @@ int main()
     {
         nowyczas+=clock.restart().asSeconds();
         pozycja=gracz.pc.getPosition();
+        kursor=sf::Mouse::getPosition(okno);
         while(okno.pollEvent(event))
         {
             if(event.type==sf::Event::Closed)
@@ -109,12 +109,39 @@ int main()
                 rdown=(mysz.y-pozycja.y)/k;
                 rleft=(pozycja.x-mysz.x)/k;
                 rright=(mysz.x-pozycja.x)/k;
+                reached=false;
             }
         }
+
         if(nowyczas-staryczas>=klatka)
         {
             staryczas=nowyczas;
             klatki++;
+
+        if(kursor.y<100)
+        {
+            for(int i=0; i<2304; i++)
+                siatka[i].podloga.move(0,5);
+            gracz.pc.move(0,5);
+        }
+        if(kursor.y>ekrany-100)
+        {
+            for(int i=0; i<2304; i++)
+                siatka[i].podloga.move(0,-5);
+            gracz.pc.move(0,-5);
+        }
+        if(kursor.x<100)
+        {
+            for(int i=0; i<2304; i++)
+                siatka[i].podloga.move(5,0);
+            gracz.pc.move(5,0);
+        }
+        if(kursor.x>ekranx-100)
+        {
+            for(int i=0; i<2304; i++)
+                siatka[i].podloga.move(-5,0);
+            gracz.pc.move(-5,0);
+        }
 
             for(int i=0; i<144; i++)        //kolizje
                 if(siatka[i].sciana==true)
@@ -135,35 +162,53 @@ int main()
                             kolprawo=true;
                     }
                 }
-            gracz.pc.setTextureRect(sf::IntRect(0,0, 100,100)); //ruch
+            gracz.pc.setTextureRect(sf::IntRect(0,0, 100,100));
+            if(!reached)    //ruch
+            {
+                reached=true;
             if(mysz.y<pozycja.y&&rup>0&&!kolgora)
             {
                 gracz.pc.move(0,-rup);
-                gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%3),0,100,100));
+                gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),300,100,100));
+                reached=false;
             }
             if(mysz.y>pozycja.y&&rdown>0&&!koldol)
             {
                 gracz.pc.move(0,rdown);
-                gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%3),0,100,100));
+                gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));
+                reached=false;
             }
             if(mysz.x>pozycja.x&&rright>0&&!kolprawo)
             {
                 gracz.pc.move(rright,0);
-                gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%3),0,100,100));
+                gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),100,100,100));
+                if(rright<=rup)
+                    gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),300,100,100));
+                if(rright<=rdown)
+                    gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));
+                reached=false;
             }
             if(mysz.x<pozycja.x&&rleft>0&&!kollewo)
             {
                 gracz.pc.move(-rleft,0);
-                gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%3),0,100,100));
+                gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),200,100,100));
+                if(rleft<=rup)
+                    gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),300,100,100));
+                if(rleft<=rdown)
+                    gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));
+                reached=false;
             }
+            }
+
         }
         kolgora=false;
         koldol=false;
         kolprawo=false;
         kollewo=false;
         okno.clear(sf::Color::Black);
-        for(int i=0; i<144; i++)
-            okno.draw(siatka[i].podloga);
+        for(int i=0; i<2304; i++)
+            if(siatka[i].podloga.getPosition().x<ekranx+10&&siatka[i].podloga.getPosition().y<ekrany+10&&siatka[i].podloga.getPosition().x>-110&&siatka[i].podloga.getPosition().y>-110)
+                okno.draw(siatka[i].podloga);
         okno.draw(gracz.pc);
         okno.display();
     }
