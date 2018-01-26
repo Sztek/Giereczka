@@ -403,8 +403,9 @@
 	<ctime>
 	<cstdlib>
 
-1516921997 source:c:\users\kuba\documents\github\giereczka\gamejam\main.cpp
+1516985380 source:c:\users\kuba\documents\github\giereczka\gamejam\main.cpp
 	<SFML/Graphics.hpp>
+	<SFML/Audio/Music.hpp>
 	<cmath>
 	<iostream>
 	<windows.h>
@@ -798,4 +799,38 @@
 	<SFML/System/String.hpp>
 	<string>
 	<vector>
+
+1486736456 c:\users\kuba\documents\github\giereczka\sfml-2.4.2\include\sfml\audio\music.hpp
+	<SFML/Audio/Export.hpp>
+	<SFML/Audio/SoundStream.hpp>
+	<SFML/Audio/InputSoundFile.hpp>
+	<SFML/System/Mutex.hpp>
+	<SFML/System/Time.hpp>
+	<string>
+	<vector>
+
+1486736398 c:\users\kuba\documents\github\giereczka\sfml-2.4.2\include\sfml\audio\export.hpp
+	<SFML/Config.hpp>
+
+1486736456 c:\users\kuba\documents\github\giereczka\sfml-2.4.2\include\sfml\audio\soundstream.hpp
+	<SFML/Audio/Export.hpp>
+	<SFML/Audio/SoundSource.hpp>
+	<SFML/System/Thread.hpp>
+	<SFML/System/Time.hpp>
+	<SFML/System/Mutex.hpp>
+	<cstdlib>
+
+1486736398 c:\users\kuba\documents\github\giereczka\sfml-2.4.2\include\sfml\audio\soundsource.hpp
+	<SFML/Audio/Export.hpp>
+	<SFML/Audio/AlResource.hpp>
+	<SFML/System/Vector3.hpp>
+
+1486736398 c:\users\kuba\documents\github\giereczka\sfml-2.4.2\include\sfml\audio\alresource.hpp
+	<SFML/Audio/Export.hpp>
+
+1486736456 c:\users\kuba\documents\github\giereczka\sfml-2.4.2\include\sfml\audio\inputsoundfile.hpp
+	<SFML/Audio/Export.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<SFML/System/Time.hpp>
+	<string>
 

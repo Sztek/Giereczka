@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio/Music.hpp>
 #include <cmath>
 #include <iostream>
 #include <windows.h>
@@ -6,7 +7,7 @@
 #include <cstdlib>
 
 double ekranx=sf::VideoMode::getDesktopMode().width,ekrany=sf::VideoMode::getDesktopMode().height;
-//double ekranx=1600,ekrany=900;
+double skalax=ekranx/1600,skalay=ekrany/900;
 
 class Protagonista
 {
@@ -17,11 +18,11 @@ public:
 };
 void Protagonista::rysuj(int x,int y)
 {
-    tpc.loadFromFile("palk4.png");
+    tpc.loadFromFile("palk14.png");
     pc.setTexture(tpc);
-    pc.setTextureRect(sf::IntRect(0,0, 100,100));
-    pc.setScale(ekranx/1600,ekrany/900);
-    pc.setPosition(x*100*ekranx/1600,y*100*ekrany/900);
+    pc.setTextureRect(sf::IntRect(100,0, 100,100));
+    pc.setScale(skalax,skalay);
+    pc.setPosition(x*100*skalax,y*100*skalay);
     pc.setOrigin(50,100);
 }
 
@@ -30,8 +31,7 @@ class Mapa
 public:
     sf::Texture tpodloga;
     sf::Sprite podloga;
-    sf::Texture tsciana;
-    sf::Sprite sciana;
+    bool sciana;
     int i;
     void rysuj(int x,int y,int t);
 };
@@ -42,40 +42,51 @@ void Mapa::rysuj(int x,int y,int t)
     case 1:
         i=rand()%2;
         tpodloga.loadFromFile("trawa.png");
-        podloga.setTextureRect(sf::IntRect(i*100,0, (i+1)*100,100));
+        podloga.setTextureRect(sf::IntRect(i*100,0, 100,100));
+        sciana=false;
         break;
     case 2:
         tpodloga.loadFromFile("wall.png");
+        sciana=true;
         break;
     default:
         tpodloga.loadFromFile("trawa1.png");
+        sciana=false;
         break;
     }
     podloga.setTexture(tpodloga);
-    podloga.setScale(ekranx/1600,ekrany/900);
-    podloga.setPosition(x*100*ekranx/1600,y*100*ekrany/900);
+    podloga.setScale(skalax,skalay);
+    podloga.setPosition(x*100*skalax,y*100*skalay);
 }
 
 int main()
 {
-    Protagonista gracz;
+
+    sf::Music music;            //muzyka
+    music.setVolume(20);
+    music.setLoop(true);
+    music.openFromFile("riff_3.ogg");
+    music.play();
+
+    Protagonista gracz;         //klasy
     Mapa siatka[144];
 
-    sf::Vector2i mysz;
-    sf::Vector2f pozycja;
+    sf::Vector2i mysz;          //deklaracje
+    sf::Vector2f pozycja,wall;
     sf::Event event;
     sf::Clock clock;
     double nowyczas=0,staryczas=0,klatka=0.015f;
     int klatki=0;
     double rup=0,rdown=0,rright=0,rleft=0,k=0;
+    bool kolgora=false,koldol=false,kolprawo=false,kollewo=false;
 
-    gracz.rysuj(3,2);
+    gracz.rysuj(3,2);           //rysowanko
     for(int i=0; i<16; i++)
         for(int j=1; j<9; j++)
             siatka[j*16+i].rysuj(i,j,1);
-    for(int i=0;i<16;i++)
+    for(int i=0; i<16; i++)
         siatka[i].rysuj(i,0,2);
-
+    siatka[5].rysuj(1,1,1);
 
     sf::ContextSettings settings;
     settings.antialiasingLevel=16;
@@ -105,15 +116,51 @@ int main()
             staryczas=nowyczas;
             klatki++;
 
-            if(mysz.y<pozycja.y&&rup>0)
+            for(int i=0; i<144; i++)        //kolizje
+                if(siatka[i].sciana==true)
+                {
+                    wall=siatka[i].podloga.getPosition();
+                    if(wall.x+110*skalax>=pozycja.x&&wall.x<pozycja.x)
+                    {
+                        if(wall.y+110*skalay>=pozycja.y&&wall.y<pozycja.y)
+                            kolgora=true;
+                        if(wall.y>=pozycja.y&&wall.y<pozycja.y+20)
+                            koldol=true;
+                    }
+                    if(wall.y<pozycja.y&&wall.y+100*skalay>pozycja.y)
+                    {
+                        if(wall.x+130*skalax>=pozycja.x&&wall.x<=pozycja.x)
+                            kollewo=true;
+                        if(wall.x>=pozycja.x&&wall.x<pozycja.x+30*skalax)
+                            kolprawo=true;
+                    }
+                }
+            gracz.pc.setTextureRect(sf::IntRect(0,0, 100,100)); //ruch
+            if(mysz.y<pozycja.y&&rup>0&&!kolgora)
+            {
                 gracz.pc.move(0,-rup);
-            if(mysz.y>pozycja.y&&rdown>0)
+                gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%3),0,100,100));
+            }
+            if(mysz.y>pozycja.y&&rdown>0&&!koldol)
+            {
                 gracz.pc.move(0,rdown);
-            if(mysz.x>pozycja.x&&rright>0)
+                gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%3),0,100,100));
+            }
+            if(mysz.x>pozycja.x&&rright>0&&!kolprawo)
+            {
                 gracz.pc.move(rright,0);
-            if(mysz.x<pozycja.x&&rleft>0)
+                gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%3),0,100,100));
+            }
+            if(mysz.x<pozycja.x&&rleft>0&&!kollewo)
+            {
                 gracz.pc.move(-rleft,0);
+                gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%3),0,100,100));
+            }
         }
+        kolgora=false;
+        koldol=false;
+        kolprawo=false;
+        kollewo=false;
         okno.clear(sf::Color::Black);
         for(int i=0; i<144; i++)
             okno.draw(siatka[i].podloga);
