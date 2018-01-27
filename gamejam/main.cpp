@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <vector>
+#include <fstream>
 
 double ekranx=sf::VideoMode::getDesktopMode().width,ekrany=sf::VideoMode::getDesktopMode().height;
 double skalax=ekranx/1600,skalay=ekrany/900;
@@ -34,25 +35,33 @@ public:
     sf::Texture tpodloga;
     sf::Sprite podloga;
     bool sciana;
-    int i;
-    void rysuj(int x,int y,int t);
+    char i;
+    void rysuj(int x,int y,char t);
 };
-void Mapa::rysuj(int x,int y,int t)
+void Mapa::rysuj(int x,int y,char t)
 {
     switch(t)
     {
-    case 1:
+    case '1':
         i=rand()%2;
         tpodloga.loadFromFile("trawa.png");
         podloga.setTextureRect(sf::IntRect(i*100,0, 100,100));
         sciana=false;
         break;
-    case 2:
+    case '2':
         tpodloga.loadFromFile("wall.png");
         sciana=true;
         break;
+    case '3':
+        tpodloga.loadFromFile("wallleft.png");
+        sciana=true;
+        break;
+    case '4':
+        tpodloga.loadFromFile("wallright.png");
+        sciana=true;
+        break;
     default:
-        tpodloga.loadFromFile("trawa1.png");
+        tpodloga.loadFromFile("trawa.png");
         sciana=false;
         break;
     }
@@ -63,12 +72,16 @@ void Mapa::rysuj(int x,int y,int t)
 
 int main()
 {
+    std::fstream plik("mapa1.txt",std::ios::in);
+    char polozenie[2306];
+    plik.read(polozenie,2306);
+
 
     sf::Music music;            //muzyka
     music.setVolume(20);
     music.setLoop(true);
     music.openFromFile("riff_3.ogg");
-    //music.play();
+    music.play();
 
     Protagonista gracz;         //klasy
     Mapa siatka[2304];
@@ -85,7 +98,7 @@ int main()
     gracz.rysuj(3,2);           //rysowanko
     for(int i=0; i<64; i++)
         for(int j=0; j<36; j++)
-            siatka[i*36+j].rysuj(i,j,1);
+            siatka[j*64+i].rysuj(i,j,polozenie[j*64+i]);
 
     sf::ContextSettings settings;
     settings.antialiasingLevel=16;
@@ -118,40 +131,40 @@ int main()
             staryczas=nowyczas;
             klatki++;
 
-        if(kursor.y<100)
+        if(kursor.y<10)
         {
             for(int i=0; i<2304; i++)
                 siatka[i].podloga.move(0,5);
             gracz.pc.move(0,5);
         }
-        if(kursor.y>ekrany-100)
+        if(kursor.y>ekrany-10)
         {
             for(int i=0; i<2304; i++)
                 siatka[i].podloga.move(0,-5);
             gracz.pc.move(0,-5);
         }
-        if(kursor.x<100)
+        if(kursor.x<10)
         {
             for(int i=0; i<2304; i++)
                 siatka[i].podloga.move(5,0);
             gracz.pc.move(5,0);
         }
-        if(kursor.x>ekranx-100)
+        if(kursor.x>ekranx-10)
         {
             for(int i=0; i<2304; i++)
                 siatka[i].podloga.move(-5,0);
             gracz.pc.move(-5,0);
         }
 
-            for(int i=0; i<144; i++)        //kolizje
+            for(int i=0; i<2304; i++)        //kolizje
                 if(siatka[i].sciana==true)
                 {
                     wall=siatka[i].podloga.getPosition();
-                    if(wall.x+110*skalax>=pozycja.x&&wall.x<pozycja.x)
+                    if(wall.x+110*skalax>=pozycja.x&&wall.x-10<pozycja.x)
                     {
                         if(wall.y+110*skalay>=pozycja.y&&wall.y<pozycja.y)
                             kolgora=true;
-                        if(wall.y>=pozycja.y&&wall.y<pozycja.y+20)
+                        if(wall.y>=pozycja.y&&wall.y<=pozycja.y+5)
                             koldol=true;
                     }
                     if(wall.y<pozycja.y&&wall.y+100*skalay>pozycja.y)
