@@ -10,6 +10,7 @@
 #include <fstream>
 
 double ekranx=sf::VideoMode::getDesktopMode().width,ekrany=sf::VideoMode::getDesktopMode().height;
+//double ekranx=1600,ekrany=900;
 double skalax=ekranx/1600,skalay=ekrany/900;
 
 class Protagonista
@@ -60,8 +61,16 @@ void Mapa::rysuj(int x,int y,char t)
         tpodloga.loadFromFile("wallright.png");
         sciana=true;
         break;
+    case '5':
+        tpodloga.loadFromFile("las.png");
+        sciana=true;
+        break;
+    case '6':
+        tpodloga.loadFromFile("korona.png");
+        sciana=true;
+        break;
     default:
-        tpodloga.loadFromFile("trawa.png");
+        tpodloga.loadFromFile("");
         sciana=false;
         break;
     }
@@ -81,17 +90,18 @@ int main()
     music.setVolume(20);
     music.setLoop(true);
     music.openFromFile("riff_3.ogg");
-    music.play();
+    //music.play();
 
     Protagonista gracz;         //klasy
     Mapa siatka[2304];
 
     sf::Vector2i mysz,kursor;          //deklaracje
     sf::Vector2f pozycja,wall;
+    std::vector<int>sciezka;
     sf::Event event;
     sf::Clock clock;
     double nowyczas=0,staryczas=0,klatka=0.015f;
-    int klatki=0;
+    int klatki=0,xx,yy,poz;
     double rup=0,rdown=0,rright=0,rleft=0,k=0;
     bool kolgora=false,koldol=false,kolprawo=false,kollewo=false,reached;
 
@@ -110,6 +120,9 @@ int main()
         kursor=sf::Mouse::getPosition(okno);
         while(okno.pollEvent(event))
         {
+            xx=pozycja.x/100;
+            yy=pozycja.y/100;
+            poz=(yy*64)+(xx);
             if(event.type==sf::Event::Closed)
                 okno.close();
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
@@ -123,6 +136,22 @@ int main()
                 rleft=(pozycja.x-mysz.x)/k;
                 rright=(mysz.x-pozycja.x)/k;
                 reached=false;
+                if(rup>=sqrt(8)&&siatka[poz-64].sciana)     //wyszukiwanie drogi
+                {
+
+                }
+                if(rdown>=sqrt(8)&&siatka[poz+64].sciana)
+                {
+
+                }
+                if(rright>=sqrt(8)&&siatka[poz+1].sciana)
+                {
+
+                }
+                if(rleft>=sqrt(8)&&siatka[poz-1].sciana)
+                {
+
+                }
             }
         }
 
@@ -131,7 +160,7 @@ int main()
             staryczas=nowyczas;
             klatki++;
 
-        if(kursor.y<10)
+        if(kursor.y<10)     //ruch ekranu
         {
             for(int i=0; i<2304; i++)
                 siatka[i].podloga.move(0,5);
@@ -176,7 +205,7 @@ int main()
                     }
                 }
             gracz.pc.setTextureRect(sf::IntRect(0,0, 100,100));
-            if(!reached)    //ruch
+            if(!reached)    //ruch paladyna
             {
                 reached=true;
             if(mysz.y<pozycja.y&&rup>0&&!kolgora)
@@ -212,7 +241,6 @@ int main()
                 reached=false;
             }
             }
-
         }
         kolgora=false;
         koldol=false;
