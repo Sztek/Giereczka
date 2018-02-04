@@ -16,9 +16,12 @@ double skalax=ekranx/1600,skalay=ekrany/900;
 class Protagonista
 {
 public:
+    int hp,zamach,dmg,droga;
+    bool atak,atakowany;
     sf::Texture tpc;
     sf::Sprite pc;
     void rysuj(int x,int y);
+    void napoleon(int x,int y);
 };
 void Protagonista::rysuj(int x,int y)
 {
@@ -28,6 +31,39 @@ void Protagonista::rysuj(int x,int y)
     pc.setScale(skalax,skalay);
     pc.setPosition(x*100*skalax,y*100*skalay);
     pc.setOrigin(50,100);
+    hp=10;
+    droga=0;
+    dmg=2;
+    atak=false;
+    atakowany=false;
+}
+
+void Protagonista::napoleon(int x,int y)
+{
+    tpc.loadFromFile("palk1.png");
+    pc.setTexture(tpc);
+    pc.setScale(skalax,skalay);
+    pc.setPosition(x*100*skalax,y*100*skalay);
+    hp=2;
+    dmg=1;
+    atak=false;
+    atakowany=false;
+}
+
+class Serce
+{
+public:
+    sf::Texture thrth;
+    sf::Sprite hrth;
+    void rysuj(int i);
+};
+
+void Serce::rysuj(int i)
+{
+    thrth.loadFromFile("hearth.png");
+    hrth.setTexture(thrth);
+    hrth.setScale(2,2);
+    hrth.setPosition(i*24+2,0);
 }
 
 class Mapa
@@ -85,7 +121,6 @@ int main()
     char polozenie[2306];
     plik.read(polozenie,2306);
 
-
     sf::Music music;            //muzyka
     music.setVolume(20);
     music.setLoop(true);
@@ -93,22 +128,30 @@ int main()
     //music.play();
 
     Protagonista gracz;         //klasy
+    Protagonista wrog[25];
     Mapa siatka[2304];
 
     sf::Vector2i mysz,kursor;          //deklaracje
-    sf::Vector2f pozycja,wall;
+    sf::Vector2f pozycja,wall,przeciwnik;
     std::vector<int>sciezka;
     sf::Event event;
     sf::Clock clock;
     double nowyczas=0,staryczas=0,klatka=0.015f;
-    int klatki=0,xx,yy,poz;
-    double rup=0,rdown=0,rright=0,rleft=0,k=0;
+    int klatki=0,xx,yy,poz,odleglosc;
+    double rup=0,rdown=0,rright=0,rleft=0,k=0,reup=0,redown=0,reright=0,releft=0;
     bool kolgora=false,koldol=false,kolprawo=false,kollewo=false,reached;
+    static int rk=10;//ruch kamery
 
     gracz.rysuj(3,2);           //rysowanko
     for(int i=0; i<64; i++)
         for(int j=0; j<36; j++)
             siatka[j*64+i].rysuj(i,j,polozenie[j*64+i]);
+    for(int i=0; i<25; i++)
+        wrog[i].napoleon(5,10+i);
+
+    Serce zycie[gracz.hp];
+    for(int i=0; i<gracz.hp; i++)
+        zycie[i].rysuj(i);
 
     sf::ContextSettings settings;
     settings.antialiasingLevel=16;
@@ -136,21 +179,29 @@ int main()
                 rleft=(pozycja.x-mysz.x)/k;
                 rright=(mysz.x-pozycja.x)/k;
                 reached=false;
+                for(int i=0; i<25; i++)
+                {
+                    przeciwnik=wrog[i].pc.getPosition();
+                    if(mysz.x>przeciwnik.x+20*skalax&&mysz.x<przeciwnik.x+80*skalax&&mysz.y>przeciwnik.y&&mysz.y<przeciwnik.y+100*skalay)
+                    {
+                        wrog[i].atakowany=true;
+                        gracz.atak=true;
+                        wrog[i].hp=0;
+                    }
+                    else
+                        wrog[i].atakowany=false;
+                }
                 if(rup>=sqrt(8)&&siatka[poz-64].sciana)     //wyszukiwanie drogi
                 {
-
                 }
                 if(rdown>=sqrt(8)&&siatka[poz+64].sciana)
                 {
-
                 }
                 if(rright>=sqrt(8)&&siatka[poz+1].sciana)
                 {
-
                 }
                 if(rleft>=sqrt(8)&&siatka[poz-1].sciana)
                 {
-
                 }
             }
         }
@@ -160,30 +211,97 @@ int main()
             staryczas=nowyczas;
             klatki++;
 
-        if(kursor.y<10)     //ruch ekranu
-        {
-            for(int i=0; i<2304; i++)
-                siatka[i].podloga.move(0,5);
-            gracz.pc.move(0,5);
-        }
-        if(kursor.y>ekrany-10)
-        {
-            for(int i=0; i<2304; i++)
-                siatka[i].podloga.move(0,-5);
-            gracz.pc.move(0,-5);
-        }
-        if(kursor.x<10)
-        {
-            for(int i=0; i<2304; i++)
-                siatka[i].podloga.move(5,0);
-            gracz.pc.move(5,0);
-        }
-        if(kursor.x>ekranx-10)
-        {
-            for(int i=0; i<2304; i++)
-                siatka[i].podloga.move(-5,0);
-            gracz.pc.move(-5,0);
-        }
+            for(int i=0; i<25; i++)
+                if(wrog[i].hp>0)
+                {
+                    przeciwnik=wrog[i].pc.getPosition();
+                    odleglosc=sqrt((pozycja.x-przeciwnik.x)*(pozycja.x-przeciwnik.x)+(pozycja.y-przeciwnik.y)*(pozycja.y-przeciwnik.y));
+                    reup=(pozycja.y-przeciwnik.y)/(odleglosc/4);
+                    redown=(przeciwnik.y-pozycja.y)/(odleglosc/4);
+                    releft=(pozycja.x-przeciwnik.x)/(odleglosc/4);
+                    reright=(przeciwnik.x-pozycja.x)/(odleglosc/4);
+                    if(odleglosc<600&&!wrog[i].atak)
+                    {
+                        if(odleglosc>400)
+                        {
+                            if(przeciwnik.y<pozycja.y&&reup>0)
+                            {
+                                wrog[i].pc.move(0,reup);
+                                //gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),300,100,100));
+                            }
+                            if(przeciwnik.y>pozycja.y&&redown>0)
+                            {
+                                wrog[i].pc.move(0,-redown);
+                                //gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));
+                            }
+                            if(przeciwnik.x>pozycja.x&&reright>0)
+                            {
+                                wrog[i].pc.move(-reright,0);
+                                /*gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),100,100,100));
+                                if(rright<=rup)
+                                    gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),300,100,100));
+                                if(rright<=rdown)
+                                    gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));*/
+                            }
+                            if(przeciwnik.x<pozycja.x&&releft>0)
+                            {
+                                wrog[i].pc.move(releft,0);
+                                /*gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),200,100,100));
+                                if(rleft<=rup)
+                                    gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),300,100,100));
+                                if(rleft<=rdown)
+                                    gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));*/
+                            }
+                        }
+                        else
+                        {
+                            wrog[i].atak=true;
+                            wrog[i].zamach=klatki;
+                        }
+                    }
+                    if(wrog[i].atak)
+                    {
+                        if(wrog[i].zamach+120<=klatki)
+                        {
+                            wrog[i].atak=false;
+                            if(odleglosc<800)
+                                gracz.hp-=wrog[i].dmg;
+                        }
+                    }
+                }
+
+            if(kursor.y<10)     //ruch ekranu
+            {
+                for(int i=0; i<2304; i++)
+                    siatka[i].podloga.move(0,rk);
+                gracz.pc.move(0,rk);
+                for(int i=0; i<25; i++)
+                    wrog[i].pc.move(0,rk);
+            }
+            if(kursor.y>ekrany-10)
+            {
+                for(int i=0; i<2304; i++)
+                    siatka[i].podloga.move(0,-rk);
+                gracz.pc.move(0,-rk);
+                for(int i=0; i<25; i++)
+                    wrog[i].pc.move(0,-rk);
+            }
+            if(kursor.x<10)
+            {
+                for(int i=0; i<2304; i++)
+                    siatka[i].podloga.move(rk,0);
+                gracz.pc.move(rk,0);
+                for(int i=0; i<25; i++)
+                    wrog[i].pc.move(rk,0);
+            }
+            if(kursor.x>ekranx-10)
+            {
+                for(int i=0; i<2304; i++)
+                    siatka[i].podloga.move(-rk,0);
+                gracz.pc.move(-rk,0);
+                for(int i=0; i<25; i++)
+                    wrog[i].pc.move(-rk,0);
+            }
 
             for(int i=0; i<2304; i++)        //kolizje
                 if(siatka[i].sciana==true)
@@ -208,38 +326,44 @@ int main()
             if(!reached)    //ruch paladyna
             {
                 reached=true;
-            if(mysz.y<pozycja.y&&rup>0&&!kolgora)
-            {
-                gracz.pc.move(0,-rup);
-                gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),300,100,100));
-                reached=false;
-            }
-            if(mysz.y>pozycja.y&&rdown>0&&!koldol)
-            {
-                gracz.pc.move(0,rdown);
-                gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));
-                reached=false;
-            }
-            if(mysz.x>pozycja.x&&rright>0&&!kolprawo)
-            {
-                gracz.pc.move(rright,0);
-                gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),100,100,100));
-                if(rright<=rup)
+                if(rup>0&&!kolgora)
+                {
+                    gracz.pc.move(0,-rup);
                     gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),300,100,100));
-                if(rright<=rdown)
+                    reached=false;
+                }
+                if(rdown>0&&!koldol)
+                {
+                    gracz.pc.move(0,rdown);
                     gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));
-                reached=false;
-            }
-            if(mysz.x<pozycja.x&&rleft>0&&!kollewo)
-            {
-                gracz.pc.move(-rleft,0);
-                gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),200,100,100));
-                if(rleft<=rup)
-                    gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),300,100,100));
-                if(rleft<=rdown)
-                    gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));
-                reached=false;
-            }
+                    reached=false;
+                }
+                if(rright>0&&!kolprawo)
+                {
+                    gracz.pc.move(rright,0);
+                    gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),100,100,100));
+                    if(rright<=rup)
+                        gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),300,100,100));
+                    if(rright<=rdown)
+                        gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));
+                    reached=false;
+                }
+                if(rleft>0&&!kollewo)
+                {
+                    gracz.pc.move(-rleft,0);
+                    gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),200,100,100));
+                    if(rleft<=rup)
+                        gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),300,100,100));
+                    if(rleft<=rdown)
+                        gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));
+                    reached=false;
+                }
+                gracz.droga+=sqrt(pow(rup,2)+pow(rright,2));
+                if(gracz.droga>=k*4)
+                {
+                    reached=true;
+                    gracz.droga=0;
+                }
             }
         }
         kolgora=false;
@@ -250,7 +374,13 @@ int main()
         for(int i=0; i<2304; i++)
             if(siatka[i].podloga.getPosition().x<ekranx+10&&siatka[i].podloga.getPosition().y<ekrany+10&&siatka[i].podloga.getPosition().x>-110&&siatka[i].podloga.getPosition().y>-110)
                 okno.draw(siatka[i].podloga);
-        okno.draw(gracz.pc);
+        for(int i=0; i<25; i++)
+            if(wrog[i].hp>0)
+                okno.draw(wrog[i].pc);
+        if(gracz.hp>0)
+            okno.draw(gracz.pc);
+        for(int i=0; i<gracz.hp; i++)
+            okno.draw(zycie[i].hrth);
         okno.display();
     }
     return 0;
