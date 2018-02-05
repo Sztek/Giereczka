@@ -16,7 +16,7 @@ double skalax=ekranx/1600,skalay=ekrany/900;
 class Protagonista
 {
 public:
-    int hp,zamach,dmg,droga;
+    int hp,zamach,dmg,droga,aps;
     bool atak,atakowany;
     sf::Texture tpc;
     sf::Sprite pc;
@@ -32,19 +32,21 @@ void Protagonista::rysuj(int x,int y)
     pc.setPosition(x*100*skalax,y*100*skalay);
     pc.setOrigin(50,100);
     hp=10;
+    aps=10;
     droga=0;
-    dmg=2;
+    dmg=1;
     atak=false;
     atakowany=false;
 }
-
 void Protagonista::napoleon(int x,int y)
 {
-    tpc.loadFromFile("palk1.png");
+    tpc.loadFromFile("palk3.png");
     pc.setTexture(tpc);
     pc.setScale(skalax,skalay);
     pc.setPosition(x*100*skalax,y*100*skalay);
-    hp=2;
+    pc.setOrigin(50,50);
+    hp=3;
+    aps=120;
     dmg=1;
     atak=false;
     atakowany=false;
@@ -57,7 +59,6 @@ public:
     sf::Sprite hrth;
     void rysuj(int i);
 };
-
 void Serce::rysuj(int i)
 {
     thrth.loadFromFile("hearth.png");
@@ -182,12 +183,8 @@ int main()
                 for(int i=0; i<25; i++)
                 {
                     przeciwnik=wrog[i].pc.getPosition();
-                    if(mysz.x>przeciwnik.x+20*skalax&&mysz.x<przeciwnik.x+80*skalax&&mysz.y>przeciwnik.y&&mysz.y<przeciwnik.y+100*skalay)
-                    {
+                    if(mysz.x>przeciwnik.x-30*skalax&&mysz.x<przeciwnik.x+30*skalax&&mysz.y>przeciwnik.y-50*skalay&&mysz.y<przeciwnik.y+50*skalay)
                         wrog[i].atakowany=true;
-                        gracz.atak=true;
-                        wrog[i].hp=0;
-                    }
                     else
                         wrog[i].atakowany=false;
                 }
@@ -261,14 +258,17 @@ int main()
                     }
                     if(wrog[i].atak)
                     {
-                        if(wrog[i].zamach+120<=klatki)
+                        if(wrog[i].zamach+wrog[i].aps<=klatki)
                         {
                             wrog[i].atak=false;
                             if(odleglosc<800)
                                 gracz.hp-=wrog[i].dmg;
                         }
                     }
+                    if(wrog[i].atakowany&&odleglosc<50&&klatki%gracz.aps==0)
+                        wrog[i].hp-=gracz.dmg;
                 }
+
 
             if(kursor.y<10)     //ruch ekranu
             {
@@ -322,6 +322,7 @@ int main()
                             kolprawo=true;
                     }
                 }
+
             gracz.pc.setTextureRect(sf::IntRect(0,0, 100,100));
             if(!reached)    //ruch paladyna
             {
