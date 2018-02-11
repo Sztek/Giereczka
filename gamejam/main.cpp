@@ -138,7 +138,7 @@ int main()
     sf::Event event;
     sf::Clock clock;
     double nowyczas=0,staryczas=0,klatka=0.015f;
-    int klatki=0,xx,yy,poz,odleglosc;
+    int klatki=0,odleglosc;
     double rup=0,rdown=0,rright=0,rleft=0,k=0,reup=0,redown=0,reright=0,releft=0;
     bool kolgora=false,koldol=false,kolprawo=false,kollewo=false,reached;
     static int rk=10;//ruch kamery
@@ -164,9 +164,6 @@ int main()
         kursor=sf::Mouse::getPosition(okno);
         while(okno.pollEvent(event))
         {
-            xx=pozycja.x/100;
-            yy=pozycja.y/100;
-            poz=(yy*64)+(xx);
             if(event.type==sf::Event::Closed)
                 okno.close();
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
@@ -187,18 +184,6 @@ int main()
                         wrog[i].atakowany=true;
                     else
                         wrog[i].atakowany=false;
-                }
-                if(rup>=sqrt(8)&&siatka[poz-64].sciana)     //wyszukiwanie drogi
-                {
-                }
-                if(rdown>=sqrt(8)&&siatka[poz+64].sciana)
-                {
-                }
-                if(rright>=sqrt(8)&&siatka[poz+1].sciana)
-                {
-                }
-                if(rleft>=sqrt(8)&&siatka[poz-1].sciana)
-                {
                 }
             }
         }
