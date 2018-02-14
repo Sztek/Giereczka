@@ -18,6 +18,7 @@ class Protagonista
 public:
     int hp,zamach,dmg,droga,aps;
     bool atak,atakowany;
+    bool kolgora,koldol,kolprawo,kollewo;
     sf::Texture tpc;
     sf::Sprite pc;
     void rysuj(int x,int y);
@@ -40,7 +41,7 @@ void Protagonista::rysuj(int x,int y)
 }
 void Protagonista::napoleon(int x,int y)
 {
-    tpc.loadFromFile("palk3.png");
+    tpc.loadFromFile("napoleon.png");
     pc.setTexture(tpc);
     pc.setScale(skalax,skalay);
     pc.setPosition(x*100*skalax,y*100*skalay);
@@ -50,6 +51,10 @@ void Protagonista::napoleon(int x,int y)
     dmg=1;
     atak=false;
     atakowany=false;
+    kolgora=false;
+    koldol=false;
+    kolprawo=false;
+    kollewo=false;
 }
 
 class Serce
@@ -80,7 +85,7 @@ void Mapa::rysuj(int x,int y,char t)
 {
     switch(t)
     {
-    case '1':
+    case '.':
         i=rand()%2;
         tpodloga.loadFromFile("trawa.png");
         podloga.setTextureRect(sf::IntRect(i*100,0, 100,100));
@@ -99,11 +104,51 @@ void Mapa::rysuj(int x,int y,char t)
         sciana=true;
         break;
     case '5':
-        tpodloga.loadFromFile("las.png");
+        tpodloga.loadFromFile("tree1.png");
+        sciana=true;
+        break;
+    case '1':
+        tpodloga.loadFromFile("tree2.png");
         sciana=true;
         break;
     case '6':
         tpodloga.loadFromFile("korona.png");
+        sciana=true;
+        break;
+    case '7':
+        tpodloga.loadFromFile("treer2.png");
+        sciana=true;
+        break;
+    case '8':
+        tpodloga.loadFromFile("treer1.png");
+        sciana=true;
+        break;
+    case '9':
+        tpodloga.loadFromFile("korona2.png");
+        sciana=true;
+        break;
+    case '0':
+        tpodloga.loadFromFile("drzewo1.png");
+        sciana=true;
+        break;
+    case 'q':
+        tpodloga.loadFromFile("drzewo2.png");
+        sciana=true;
+        break;
+    case 'Q':
+        tpodloga.loadFromFile("drzewo.png");
+        sciana=true;
+        break;
+    case 'w':
+        tpodloga.loadFromFile("drzewo3.png");
+        sciana=true;
+        break;
+    case 'W':
+        tpodloga.loadFromFile("drzewo4.png");
+        sciana=true;
+        break;
+    case 'a':
+        tpodloga.loadFromFile("drzewo5.png");
         sciana=true;
         break;
     default:
@@ -119,8 +164,8 @@ void Mapa::rysuj(int x,int y,char t)
 int main()
 {
     std::fstream plik("mapa1.txt",std::ios::in);
-    char polozenie[2306];
-    plik.read(polozenie,2306);
+    char polozenie[2304];
+    plik.read(polozenie,2304);
 
     sf::Music music;            //muzyka
     music.setVolume(20);
@@ -202,21 +247,41 @@ int main()
                     redown=(przeciwnik.y-pozycja.y)/(odleglosc/4);
                     releft=(pozycja.x-przeciwnik.x)/(odleglosc/4);
                     reright=(przeciwnik.x-pozycja.x)/(odleglosc/4);
+
+                        for(int j=0; j<2304; j++)        //kolizje
+                            if(siatka[j].sciana==true)
+                            {
+                                wall=siatka[j].podloga.getPosition();
+                                if(wall.x+55*skalax>=przeciwnik.x&&wall.x-55<przeciwnik.x)
+                                {
+                                    if(wall.y+150*skalay>=przeciwnik.y&&wall.y-50*skalay<przeciwnik.y)
+                                        wrog[i].kolgora=true;
+                                    if(wall.y>=przeciwnik.y&&wall.y<=przeciwnik.y+5)
+                                        wrog[i].koldol=true;
+                                }
+                                if(wall.y-50*skalay<przeciwnik.y&&wall.y+50*skalay>przeciwnik.y)
+                                {
+                                    if(wall.x+130*skalax>=przeciwnik.x&&wall.x<=przeciwnik.x)
+                                        wrog[i].kollewo=true;
+                                    if(wall.x>=przeciwnik.x&&wall.x<przeciwnik.x+30*skalax)
+                                        wrog[i].kolprawo=true;
+                                }
+                            }
                     if(odleglosc<600&&!wrog[i].atak)
                     {
                         if(odleglosc>400)
                         {
-                            if(przeciwnik.y<pozycja.y&&reup>0)
+                            if(przeciwnik.y<pozycja.y&&reup>0&&!wrog[i].kolgora)
                             {
                                 wrog[i].pc.move(0,reup);
                                 //gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),300,100,100));
                             }
-                            if(przeciwnik.y>pozycja.y&&redown>0)
+                            if(przeciwnik.y>pozycja.y&&redown>0&&!wrog[i].koldol)
                             {
                                 wrog[i].pc.move(0,-redown);
                                 //gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));
                             }
-                            if(przeciwnik.x>pozycja.x&&reright>0)
+                            if(przeciwnik.x>pozycja.x&&reright>0&&!wrog[i].kolprawo)
                             {
                                 wrog[i].pc.move(-reright,0);
                                 /*gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),100,100,100));
@@ -225,7 +290,7 @@ int main()
                                 if(rright<=rdown)
                                     gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));*/
                             }
-                            if(przeciwnik.x<pozycja.x&&releft>0)
+                            if(przeciwnik.x<pozycja.x&&releft>0&&!wrog[i].kollewo)
                             {
                                 wrog[i].pc.move(releft,0);
                                 /*gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),200,100,100));
@@ -252,10 +317,15 @@ int main()
                     }
                     if(wrog[i].atakowany&&odleglosc<50&&klatki%gracz.aps==0)
                         wrog[i].hp-=gracz.dmg;
+
+                    wrog[i].kolprawo=false;
+                    wrog[i].kollewo=false;
+                    wrog[i].kolgora=false;
+                    wrog[i].koldol=false;
                 }
 
 
-            if(kursor.y<10)     //ruch ekranu
+            if(kursor.y<10&&siatka[0].podloga.getPosition().y<=0)     //ruch ekranu
             {
                 for(int i=0; i<2304; i++)
                     siatka[i].podloga.move(0,rk);
@@ -271,7 +341,7 @@ int main()
                 for(int i=0; i<25; i++)
                     wrog[i].pc.move(0,-rk);
             }
-            if(kursor.x<10)
+            if(kursor.x<10&&siatka[0].podloga.getPosition().x<=0)
             {
                 for(int i=0; i<2304; i++)
                     siatka[i].podloga.move(rk,0);
@@ -279,7 +349,7 @@ int main()
                 for(int i=0; i<25; i++)
                     wrog[i].pc.move(rk,0);
             }
-            if(kursor.x>ekranx-10)
+            if(kursor.x>ekranx-10&&siatka[2303].podloga.getPosition().x<=23040)
             {
                 for(int i=0; i<2304; i++)
                     siatka[i].podloga.move(-rk,0);
@@ -307,6 +377,7 @@ int main()
                             kolprawo=true;
                     }
                 }
+
 
             gracz.pc.setTextureRect(sf::IntRect(0,0, 100,100));
             if(!reached)    //ruch paladyna
