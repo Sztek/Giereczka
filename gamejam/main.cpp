@@ -151,6 +151,38 @@ void Mapa::rysuj(int x,int y,char t)
         tpodloga.loadFromFile("drzewo5.png");
         sciana=true;
         break;
+    case 'd':
+        tpodloga.loadFromFile("drewno1.png");
+        sciana=true;
+        break;
+    case 'D':
+        tpodloga.loadFromFile("drewnodrzwi.png");
+        sciana=true;
+        break;
+    case 'f':
+        tpodloga.loadFromFile("dach1.png");
+        sciana=true;
+        break;
+    case 'k':
+        tpodloga.loadFromFile("klif1.png");
+        sciana=true;
+        break;
+    case 'j':
+        tpodloga.loadFromFile("klif3.png");
+        sciana=false;
+        break;
+    case 'l':
+        tpodloga.loadFromFile("klif2.png");
+        sciana=false;
+        break;
+    case ',':
+        tpodloga.loadFromFile("plyty.png");
+        sciana=false;
+        break;
+    case 'F':
+        tpodloga.loadFromFile("dach2.png");
+        sciana=true;
+        break;
     default:
         tpodloga.loadFromFile("");
         sciana=false;
@@ -193,14 +225,42 @@ int main()
         for(int j=0; j<36; j++)
             siatka[j*64+i].rysuj(i,j,polozenie[j*64+i]);
     for(int i=0; i<25; i++)
-        wrog[i].napoleon(5,10+i);
+        wrog[i].napoleon(5+i,31);
+
+    wrog[1].napoleon(5,31);
+    wrog[2].napoleon(8,30);
+    wrog[3].napoleon(11,31);
+    wrog[4].napoleon(60,12);
+    wrog[5].napoleon(57,12);
+    wrog[6].napoleon(61,11);
+    wrog[7].napoleon(9,12);
+    wrog[8].napoleon(7,11);
+   /* wrog[9].napoleon(,);
+    wrog[10].napoleon(,);
+    wrog[11].napoleon(,);
+    wrog[12].napoleon(,);
+    wrog[13].napoleon(,);
+    wrog[14].napoleon(,);
+    wrog[15].napoleon(,);
+    wrog[16].napoleon(,);
+    wrog[17].napoleon(,);
+    wrog[18].napoleon(,);
+    wrog[19].napoleon(,);
+    wrog[20].napoleon(,);
+    wrog[21].napoleon(,);
+    wrog[22].napoleon(,);
+    wrog[23].napoleon(,);
+    wrog[24].napoleon(,);
+    wrog[25].napoleon(,);*/
+
+
 
     Serce zycie[gracz.hp];
     for(int i=0; i<gracz.hp; i++)
         zycie[i].rysuj(i);
 
     sf::ContextSettings settings;
-    settings.antialiasingLevel=16;
+    settings.antialiasingLevel=4;
     sf::RenderWindow okno(sf::VideoMode(ekranx,ekrany),":v",sf::Style::Fullscreen,settings);
     while(okno.isOpen())
     {
