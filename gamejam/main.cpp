@@ -215,7 +215,7 @@ int main()
     sf::Event event;
     sf::Clock clock;
     double nowyczas=0,staryczas=0,klatka=0.015f;
-    int klatki=0,odleglosc;
+    int klatki=0,odleglosc,poz;
     double rup=0,rdown=0,rright=0,rleft=0,k=0,reup=0,redown=0,reright=0,releft=0;
     bool kolgora=false,koldol=false,kolprawo=false,kollewo=false,reached;
     static int rk=10;//ruch kamery
@@ -307,41 +307,41 @@ int main()
                     redown=(przeciwnik.y-pozycja.y)/(odleglosc/4);
                     releft=(pozycja.x-przeciwnik.x)/(odleglosc/4);
                     reright=(przeciwnik.x-pozycja.x)/(odleglosc/4);
-
+                    poz=przeciwnik.x/100*skalax+przeciwnik.y/100*skalay*64;
                         for(int j=0; j<2304; j++)        //kolizje
                             if(siatka[j].sciana==true)
                             {
                                 wall=siatka[j].podloga.getPosition();
-                                if(wall.x+55*skalax>=przeciwnik.x&&wall.x-55<przeciwnik.x)
+                                if(wall.x+140*skalax>=przeciwnik.x&&wall.x-40*skalax<przeciwnik.x)
                                 {
-                                    if(wall.y+150*skalay>=przeciwnik.y&&wall.y-50*skalay<przeciwnik.y)
+                                    if(wall.y+140*skalay>=przeciwnik.y&&wall.y-50*skalay<przeciwnik.y)
                                         wrog[i].kolgora=true;
-                                    if(wall.y>=przeciwnik.y&&wall.y<=przeciwnik.y+5)
+                                    if(wall.y+50>=przeciwnik.y&&wall.y-55*skalay<=przeciwnik.y)
                                         wrog[i].koldol=true;
                                 }
-                                if(wall.y-50*skalay<przeciwnik.y&&wall.y+50*skalay>przeciwnik.y)
+                                if(wall.y-50*skalay<przeciwnik.y&&wall.y+150*skalay>przeciwnik.y)
                                 {
                                     if(wall.x+130*skalax>=przeciwnik.x&&wall.x<=przeciwnik.x)
-                                        wrog[i].kollewo=true;
-                                    if(wall.x>=przeciwnik.x&&wall.x<przeciwnik.x+30*skalax)
                                         wrog[i].kolprawo=true;
+                                    if(wall.x>=przeciwnik.x&&wall.x+30*skalax<przeciwnik.x)
+                                        wrog[i].kollewo=true;
                                 }
                             }
                     if(odleglosc<600&&!wrog[i].atak)
                     {
                         if(odleglosc>400)
                         {
-                            if(przeciwnik.y<pozycja.y&&reup>0&&!wrog[i].kolgora)
+                            if(przeciwnik.y<pozycja.y&&reup>0&&!wrog[i].koldol)
                             {
                                 wrog[i].pc.move(0,reup);
                                 //gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),300,100,100));
                             }
-                            if(przeciwnik.y>pozycja.y&&redown>0&&!wrog[i].koldol)
+                            if(przeciwnik.y>pozycja.y&&redown>0&&!wrog[i].kolgora)
                             {
                                 wrog[i].pc.move(0,-redown);
                                 //gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));
                             }
-                            if(przeciwnik.x>pozycja.x&&reright>0&&!wrog[i].kolprawo)
+                            if(przeciwnik.x>pozycja.x&&reright>0&&!wrog[i].kollewo)
                             {
                                 wrog[i].pc.move(-reright,0);
                                 /*gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),100,100,100));
@@ -350,7 +350,7 @@ int main()
                                 if(rright<=rdown)
                                     gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));*/
                             }
-                            if(przeciwnik.x<pozycja.x&&releft>0&&!wrog[i].kollewo)
+                            if(przeciwnik.x<pozycja.x&&releft>0&&!wrog[i].kolprawo)
                             {
                                 wrog[i].pc.move(releft,0);
                                 /*gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),200,100,100));
