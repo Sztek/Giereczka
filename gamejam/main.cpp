@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <vector>
 #include <fstream>
+#include <string>
 
 double ekranx=sf::VideoMode::getDesktopMode().width,ekrany=sf::VideoMode::getDesktopMode().height;
 //double ekranx=1600,ekrany=900;
@@ -41,8 +42,9 @@ void Protagonista::rysuj(int x,int y)
 }
 void Protagonista::napoleon(int x,int y)
 {
-    tpc.loadFromFile("napoleon.png");
+    tpc.loadFromFile("siatkanapoleona.png");
     pc.setTexture(tpc);
+    pc.setTextureRect(sf::IntRect(100,0, 100,100));
     pc.setScale(skalax,skalay);
     pc.setPosition(x*100*skalax,y*100*skalay);
     pc.setOrigin(50,50);
@@ -193,8 +195,40 @@ void Mapa::rysuj(int x,int y,char t)
     podloga.setPosition(x*100*skalax,y*100*skalay);
 }
 
+std::string intToStr(int n)
+{
+    std::string tmp;
+    if(n < 0)
+    {
+        tmp = "-";
+        n = -n;
+    }
+    if(n > 9)
+        tmp += intToStr(n / 10);
+    tmp += n % 10 + 48;
+    return tmp;
+}
+
 int main()
 {
+    sf::ContextSettings settings;
+    settings.antialiasingLevel=16;
+    sf::RenderWindow okno(sf::VideoMode(ekranx,ekrany),":v",sf::Style::Fullscreen,settings);
+
+    int procenty;
+    sf::Font fnt;
+    fnt.loadFromFile("witcher.ttf");
+    sf::Text loading;
+    loading.setCharacterSize(30);
+    loading.setFont(fnt);
+    loading.setFillColor(sf::Color::Black);
+    loading.setPosition(ekranx-200,ekrany-150);
+    sf::Texture tmap;
+    sf::Sprite smap;
+    tmap.loadFromFile("mapaswiata.png");
+    smap.setTexture(tmap);
+    smap.setScale(skalax,skalay);
+
     std::fstream plik("mapa1.txt",std::ios::in);
     char polozenie[2304];
     plik.read(polozenie,2304);
@@ -215,18 +249,25 @@ int main()
     sf::Event event;
     sf::Clock clock;
     double nowyczas=0,staryczas=0,klatka=0.015f;
-    int klatki=0,odleglosc,poz;
+    int mapka=1,klatki=0,odleglosc,poz;
     double rup=0,rdown=0,rright=0,rleft=0,k=0,reup=0,redown=0,reright=0,releft=0;
     bool kolgora=false,koldol=false,kolprawo=false,kollewo=false,reached;
     static int rk=10;//ruch kamery
 
-    gracz.rysuj(3,2);           //rysowanko
+    procenty=0;
     for(int i=0; i<64; i++)
         for(int j=0; j<36; j++)
+        {
             siatka[j*64+i].rysuj(i,j,polozenie[j*64+i]);
-    for(int i=0; i<25; i++)
-        wrog[i].napoleon(5+i,31);
-
+            procenty++;
+            loading.setString(intToStr(procenty*100/2304)+"%");
+            okno.clear(sf::Color::Black);
+            okno.draw(smap);
+            okno.draw(loading);
+            okno.display();
+        }
+    gracz.rysuj(3,2);
+    wrog[0].napoleon(5,26);
     wrog[1].napoleon(5,31);
     wrog[2].napoleon(8,30);
     wrog[3].napoleon(11,31);
@@ -235,34 +276,27 @@ int main()
     wrog[6].napoleon(61,11);
     wrog[7].napoleon(9,12);
     wrog[8].napoleon(7,11);
-   /* wrog[9].napoleon(,);
-    wrog[10].napoleon(,);
-    wrog[11].napoleon(,);
-    wrog[12].napoleon(,);
-    wrog[13].napoleon(,);
-    wrog[14].napoleon(,);
-    wrog[15].napoleon(,);
-    wrog[16].napoleon(,);
-    wrog[17].napoleon(,);
-    wrog[18].napoleon(,);
-    wrog[19].napoleon(,);
-    wrog[20].napoleon(,);
-    wrog[21].napoleon(,);
-    wrog[22].napoleon(,);
-    wrog[23].napoleon(,);
-    wrog[24].napoleon(,);
-    wrog[25].napoleon(,);*/
-
-
+    wrog[9].napoleon(16,17);
+    wrog[10].napoleon(18,16);
+    wrog[11].napoleon(10,19);
+    wrog[12].napoleon(40,1);
+    wrog[13].napoleon(60,6);
+    wrog[14].napoleon(57,7);
+    wrog[15].napoleon(53,22);
+    wrog[16].napoleon(50,25);
+    wrog[17].napoleon(55,27);
+    wrog[18].napoleon(46,26);
+    wrog[19].napoleon(59,26);
+    wrog[20].napoleon(43,16);
+    wrog[21].napoleon(52,30);
+    wrog[22].napoleon(31,32);
+    wrog[23].napoleon(32,31);
+    wrog[24].napoleon(27,18);
 
     Serce zycie[gracz.hp];
     for(int i=0; i<gracz.hp; i++)
         zycie[i].rysuj(i);
-
-    sf::ContextSettings settings;
-    settings.antialiasingLevel=4;
-    sf::RenderWindow okno(sf::VideoMode(ekranx,ekrany),":v",sf::Style::Fullscreen,settings);
-    while(okno.isOpen())
+    while(okno.isOpen()&&mapka!=0)
     {
         nowyczas+=clock.restart().asSeconds();
         pozycja=gracz.pc.getPosition();
@@ -334,30 +368,30 @@ int main()
                             if(przeciwnik.y<pozycja.y&&reup>0&&!wrog[i].koldol)
                             {
                                 wrog[i].pc.move(0,reup);
-                                //gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),300,100,100));
+                                wrog[i].pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));
                             }
                             if(przeciwnik.y>pozycja.y&&redown>0&&!wrog[i].kolgora)
                             {
                                 wrog[i].pc.move(0,-redown);
-                                //gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));
+                                wrog[i].pc.setTextureRect(sf::IntRect(100*(klatki/5%4),300,100,100));
                             }
                             if(przeciwnik.x>pozycja.x&&reright>0&&!wrog[i].kollewo)
                             {
                                 wrog[i].pc.move(-reright,0);
-                                /*gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),100,100,100));
-                                if(rright<=rup)
-                                    gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),300,100,100));
-                                if(rright<=rdown)
-                                    gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));*/
+                                wrog[i].pc.setTextureRect(sf::IntRect(100*(klatki/5%4),100,100,100));
+                                if(reright<=redown)
+                                    wrog[i].pc.setTextureRect(sf::IntRect(100*(klatki/5%4),300,100,100));
+                                if(reright<=reup)
+                                    wrog[i].pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));
                             }
                             if(przeciwnik.x<pozycja.x&&releft>0&&!wrog[i].kolprawo)
                             {
                                 wrog[i].pc.move(releft,0);
-                                /*gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),200,100,100));
-                                if(rleft<=rup)
-                                    gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),300,100,100));
-                                if(rleft<=rdown)
-                                    gracz.pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));*/
+                                wrog[i].pc.setTextureRect(sf::IntRect(100*(klatki/5%4),200,100,100));
+                                if(releft<=redown)
+                                    wrog[i].pc.setTextureRect(sf::IntRect(100*(klatki/5%4),300,100,100));
+                                if(releft<=reup)
+                                    wrog[i].pc.setTextureRect(sf::IntRect(100*(klatki/5%4),0,100,100));
                             }
                         }
                         else

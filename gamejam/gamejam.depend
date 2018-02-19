@@ -403,7 +403,7 @@
 	<ctime>
 	<cstdlib>
 
-1518878425 source:c:\users\kuba\documents\github\giereczka\gamejam\main.cpp
+1519069874 source:c:\users\kuba\documents\github\giereczka\gamejam\main.cpp
 	<SFML/Graphics.hpp>
 	<SFML/Audio/Music.hpp>
 	<cmath>
@@ -414,6 +414,7 @@
 	<cstdio>
 	<vector>
 	<fstream>
+	<string>
 
 1486736398 c:\users\kuba\documents\github\giereczka\sfml-2.4.2\include\sfml\graphics.hpp
 	<SFML/Window.hpp>
