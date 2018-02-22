@@ -73,7 +73,7 @@ void Serce::rysuj(int i)
     hrth.setScale(2,2);
     hrth.setPosition(i*24+2,0);
 }
-
+int icel;
 class Mapa
 {
 public:
@@ -185,6 +185,21 @@ void Mapa::rysuj(int x,int y,char t)
         tpodloga.loadFromFile("dach2.png");
         sciana=true;
         break;
+    case '*':
+        tpodloga.loadFromFile("klatki.png");
+        podloga.setTextureRect(sf::IntRect((icel)*100,0, 100,100));
+        icel++;
+        sciana=true;
+        break;
+    case 'c':
+        tpodloga.loadFromFile("kraty.png");
+        sciana=true;
+        break;
+    case '#':
+        tpodloga.loadFromFile("kratki.png");
+        podloga.setTextureRect(sf::IntRect(100,0, 100,100));
+        sciana=true;
+        break;
     default:
         tpodloga.loadFromFile("");
         sciana=false;
@@ -217,7 +232,7 @@ int main()
 
     int procenty;
     sf::Font fnt;
-    fnt.loadFromFile("witcher.ttf");
+    fnt.loadFromFile("paladin.ttf");
     sf::Text loading;
     loading.setCharacterSize(30);
     loading.setFont(fnt);
@@ -225,19 +240,15 @@ int main()
     loading.setPosition(ekranx-200,ekrany-150);
     sf::Texture tmap;
     sf::Sprite smap;
-    tmap.loadFromFile("mapaswiata.png");
+    tmap.loadFromFile("loadingscreen.png");
     smap.setTexture(tmap);
     smap.setScale(skalax,skalay);
-
-    std::fstream plik("mapa1.txt",std::ios::in);
-    char polozenie[2304];
-    plik.read(polozenie,2304);
 
     sf::Music music;            //muzyka
     music.setVolume(20);
     music.setLoop(true);
     music.openFromFile("riff_3.ogg");
-    //music.play();
+    music.play();
 
     Protagonista gracz;         //klasy
     Protagonista wrog[25];
@@ -249,23 +260,87 @@ int main()
     sf::Event event;
     sf::Clock clock;
     double nowyczas=0,staryczas=0,klatka=0.015f;
-    int mapka=1,klatki=0,odleglosc,poz;
+    int mapka=1,klatki=0,odleglosc,poz,punkty=0;
     double rup=0,rdown=0,rright=0,rleft=0,k=0,reup=0,redown=0,reright=0,releft=0;
-    bool kolgora=false,koldol=false,kolprawo=false,kollewo=false,reached;
+    bool kolgora=false,koldol=false,kolprawo=false,kollewo=false,reached,ruch=false,uwolniony[3];
+    char polozenie[2304];
     static int rk=10;//ruch kamery
+    gracz.rysuj(0,0);
+    Serce zycie[gracz.hp];
 
-    procenty=0;
-    for(int i=0; i<64; i++)
-        for(int j=0; j<36; j++)
-        {
-            siatka[j*64+i].rysuj(i,j,polozenie[j*64+i]);
-            procenty++;
-            loading.setString(intToStr(procenty*100/2304)+"%");
-            okno.clear(sf::Color::Black);
-            okno.draw(smap);
-            okno.draw(loading);
-            okno.display();
-        }
+    while(mapka<=3)
+    {
+    if(mapka==1)
+    {
+        icel=1;
+        punkty=0;
+        uwolniony[0]=false;
+        uwolniony[1]=false;
+        uwolniony[2]=false;
+        std::fstream plik("mapa1.txt",std::ios::in);
+        plik.read(polozenie,2304);
+        procenty=0;
+        for(int i=0; i<64; i++)
+            for(int j=0; j<36; j++)
+                {
+                    siatka[j*64+i].rysuj(i,j,polozenie[j*64+i]);
+                    procenty++;
+                    loading.setString(intToStr(procenty*100/2304)+"%");
+                    okno.clear(sf::Color::Black);
+                    okno.draw(smap);
+                    okno.draw(loading);
+                    okno.display();
+                }
+    gracz.rysuj(3,2);
+    wrog[0].napoleon(50,34);
+    wrog[1].napoleon(5,31);
+    wrog[2].napoleon(8,30);
+    wrog[3].napoleon(11,31);
+    wrog[4].napoleon(60,12);
+    wrog[5].napoleon(57,12);
+    wrog[6].napoleon(61,11);
+    wrog[7].napoleon(9,12);
+    wrog[8].napoleon(7,11);
+    wrog[9].napoleon(16,17);
+    wrog[10].napoleon(18,16);
+    wrog[11].napoleon(10,19);
+    wrog[12].napoleon(40,1);
+    wrog[13].napoleon(60,6);
+    wrog[14].napoleon(57,7);
+    wrog[15].napoleon(53,22);
+    wrog[16].napoleon(50,25);
+    wrog[17].napoleon(55,27);
+    wrog[18].napoleon(46,26);
+    wrog[19].napoleon(59,26);
+    wrog[20].napoleon(43,16);
+    wrog[21].napoleon(52,30);
+    wrog[22].napoleon(31,32);
+    wrog[23].napoleon(32,31);
+    wrog[24].napoleon(27,18);
+    for(int i=0; i<gracz.hp; i++)
+        zycie[i].rysuj(i);
+    }
+    if(mapka==2)
+    {
+        icel=1;
+        punkty=0;
+        uwolniony[0]=false;
+        uwolniony[1]=false;
+        uwolniony[2]=false;
+        std::fstream plik("mapa2.txt",std::ios::in);
+        plik.read(polozenie,2304);
+        procenty=0;
+        for(int i=0; i<64; i++)
+            for(int j=0; j<36; j++)
+                {
+                    siatka[j*64+i].rysuj(i,j,polozenie[j*64+i]);
+                    procenty++;
+                    loading.setString(intToStr(procenty*100/2304)+"%");
+                    okno.clear(sf::Color::Black);
+                    okno.draw(smap);
+                    okno.draw(loading);
+                    okno.display();
+                }
     gracz.rysuj(3,2);
     wrog[0].napoleon(5,26);
     wrog[1].napoleon(5,31);
@@ -292,11 +367,60 @@ int main()
     wrog[22].napoleon(31,32);
     wrog[23].napoleon(32,31);
     wrog[24].napoleon(27,18);
-
-    Serce zycie[gracz.hp];
     for(int i=0; i<gracz.hp; i++)
         zycie[i].rysuj(i);
-    while(okno.isOpen()&&mapka!=0)
+    }
+    if(mapka==3)
+    {
+        icel=1;
+        punkty=0;
+        uwolniony[0]=false;
+        uwolniony[1]=false;
+        uwolniony[2]=false;
+        std::fstream plik("mapa3.txt",std::ios::in);
+        plik.read(polozenie,2304);
+        procenty=0;
+        for(int i=0; i<64; i++)
+            for(int j=0; j<36; j++)
+                {
+                    siatka[j*64+i].rysuj(i,j,polozenie[j*64+i]);
+                    procenty++;
+                    loading.setString(intToStr(procenty*100/2304)+"%");
+                    okno.clear(sf::Color::Black);
+                    okno.draw(smap);
+                    okno.draw(loading);
+                    okno.display();
+                }
+    gracz.rysuj(3,2);
+    wrog[0].napoleon(5,26);
+    wrog[1].napoleon(5,31);
+    wrog[2].napoleon(8,30);
+    wrog[3].napoleon(11,31);
+    wrog[4].napoleon(60,12);
+    wrog[5].napoleon(57,12);
+    wrog[6].napoleon(61,11);
+    wrog[7].napoleon(9,12);
+    wrog[8].napoleon(7,11);
+    wrog[9].napoleon(16,17);
+    wrog[10].napoleon(18,16);
+    wrog[11].napoleon(10,19);
+    wrog[12].napoleon(40,1);
+    wrog[13].napoleon(60,6);
+    wrog[14].napoleon(57,7);
+    wrog[15].napoleon(53,22);
+    wrog[16].napoleon(50,25);
+    wrog[17].napoleon(55,27);
+    wrog[18].napoleon(46,26);
+    wrog[19].napoleon(59,26);
+    wrog[20].napoleon(43,16);
+    wrog[21].napoleon(52,30);
+    wrog[22].napoleon(31,32);
+    wrog[23].napoleon(32,31);
+    wrog[24].napoleon(27,18);
+    for(int i=0; i<gracz.hp; i++)
+        zycie[i].rysuj(i);
+    }
+    while(okno.isOpen()&&mapka!=0&&punkty<3)
     {
         nowyczas+=clock.restart().asSeconds();
         pozycja=gracz.pc.getPosition();
@@ -306,8 +430,28 @@ int main()
             if(event.type==sf::Event::Closed)
                 okno.close();
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+            {
                 okno.close();
+                mapka=4;
+            }
             if(event.type==sf::Event::MouseButtonPressed&&event.mouseButton.button==sf::Mouse::Left)
+                ruch=true;
+            if(event.type==sf::Event::MouseButtonReleased&&event.mouseButton.button==sf::Mouse::Left)
+            {
+                ruch=false;
+                rup=0;
+                rdown=0;
+                rleft=0;
+                rright=0;
+            }
+        }
+
+        if(nowyczas-staryczas>=klatka)
+        {
+            staryczas=nowyczas;
+            klatki++;
+
+            if(ruch)
             {
                 mysz=sf::Mouse::getPosition(okno);
                 k=(sqrt((pozycja.x-mysz.x)*(pozycja.x-mysz.x)+(pozycja.y-mysz.y)*(pozycja.y-mysz.y)))/4;
@@ -325,12 +469,36 @@ int main()
                         wrog[i].atakowany=false;
                 }
             }
-        }
 
-        if(nowyczas-staryczas>=klatka)
-        {
-            staryczas=nowyczas;
-            klatki++;
+            if(mapka==1)
+            {
+                if(pozycja.x>siatka[700].podloga.getPosition().x&&pozycja.x<siatka[700].podloga.getPosition().x+100)
+                    if(pozycja.y+100>siatka[700].podloga.getPosition().y&&pozycja.y<siatka[700].podloga.getPosition().y+200)
+                        if(!uwolniony[0])
+                        {
+                            siatka[700].podloga.setTextureRect(sf::IntRect(0,0, 100,100));
+                            punkty++;
+                            uwolniony[0]=true;
+                        }
+                if(pozycja.x>siatka[1859].podloga.getPosition().x&&pozycja.x<siatka[1859].podloga.getPosition().x+100)
+                    if(pozycja.y+100>siatka[1859].podloga.getPosition().y&&pozycja.y<siatka[1859].podloga.getPosition().y+200)
+                        if(!uwolniony[1])
+                        {
+                            siatka[1859].podloga.setTextureRect(sf::IntRect(0,0, 100,100));
+                            punkty++;
+                            uwolniony[1]=true;
+                        }
+                if(pozycja.x>siatka[2156].podloga.getPosition().x&&pozycja.x<siatka[2156].podloga.getPosition().x+100)
+                    if(pozycja.y+100>siatka[2156].podloga.getPosition().y&&pozycja.y<siatka[2156].podloga.getPosition().y+200)
+                        if(!uwolniony[2])
+                        {
+                            siatka[2156].podloga.setTextureRect(sf::IntRect(0,0, 100,100));
+                            punkty++;
+                            uwolniony[2]=true;
+                        }
+            }
+            if(punkty>=3)
+                mapka++;
 
             for(int i=0; i<25; i++)
                 if(wrog[i].hp>0)
@@ -410,7 +578,12 @@ int main()
                         }
                     }
                     if(wrog[i].atakowany&&odleglosc<50&&klatki%gracz.aps==0)
+                    {
                         wrog[i].hp-=gracz.dmg;
+                        ruch=false;
+                        if(wrog[i].hp==0&&gracz.hp<10)
+                            gracz.hp++;
+                    }
 
                     wrog[i].kolprawo=false;
                     wrog[i].kollewo=false;
@@ -456,18 +629,18 @@ int main()
                 if(siatka[i].sciana==true)
                 {
                     wall=siatka[i].podloga.getPosition();
-                    if(wall.x+110*skalax>=pozycja.x&&wall.x-10<pozycja.x)
+                    if(wall.x+110*skalax>=pozycja.x&&wall.x-10<=pozycja.x)
                     {
-                        if(wall.y+110*skalay>=pozycja.y&&wall.y<pozycja.y)
+                        if(wall.y+110*skalay>=pozycja.y&&wall.y<=pozycja.y)
                             kolgora=true;
                         if(wall.y>=pozycja.y&&wall.y<=pozycja.y+5)
                             koldol=true;
                     }
-                    if(wall.y<pozycja.y&&wall.y+100*skalay>pozycja.y)
+                    if(wall.y<=pozycja.y&&wall.y+100*skalay>=pozycja.y)
                     {
                         if(wall.x+130*skalax>=pozycja.x&&wall.x<=pozycja.x)
                             kollewo=true;
-                        if(wall.x>=pozycja.x&&wall.x<pozycja.x+30*skalax)
+                        if(wall.x>=pozycja.x&&wall.x<=pozycja.x+30*skalax)
                             kolprawo=true;
                     }
                 }
@@ -533,6 +706,7 @@ int main()
         for(int i=0; i<gracz.hp; i++)
             okno.draw(zycie[i].hrth);
         okno.display();
+    }
     }
     return 0;
 }
