@@ -349,6 +349,8 @@ int main()
     sf::Music music;            //muzyka
     music.setVolume(20);
     music.setLoop(true);
+    sf::Music strzal;
+    strzal.openFromFile("musket.ogg");
     Protagonista gracz;         //klasy
     Protagonista wrog[25];
     Mapa siatka[2304];
@@ -492,6 +494,7 @@ int main()
         if(mapka==3)
         {
             music.openFromFile("muzyka1.ogg");
+            strzal.openFromFile("cannon.ogg");
             music.play();
             icel=1;
             punkty=0;
@@ -666,7 +669,7 @@ int main()
                             }
 
                         //if(odleglosc<600*skalax*skalay)
-                        for(int j=0; j<2304; j++)
+                        /*for(int j=0; j<2304; j++)
                             for(int o=0; o<=odleglosc; o+=100)
                                 if(siatka[j].sciana==true)
                                 {
@@ -685,11 +688,11 @@ int main()
                                         if(wall.x>=przeciwnik.x-(o*skalax)&&wall.x+30*skalax<przeciwnik.x-(o*skalax))
                                             wrog[i].widzi=false;
                                     }
-                                }
+                                }*/
 
-                        if(odleglosc<600*skalax*skalay&&wrog[i].widzi&&!wrog[i].atak)
+                        if(odleglosc<400*skalax*skalay&&wrog[i].widzi&&!wrog[i].atak)
                         {
-                            if(odleglosc>400*skalax*skalay)
+                            if(odleglosc>300*skalax*skalay)
                             {
                                 if(przeciwnik.y<pozycja.y&&reup>0&&!wrog[i].koldol)
                                 {
@@ -758,10 +761,11 @@ int main()
                             if(wrog[i].zamach+wrog[i].aps<=klatki)
                             {
                                 wrog[i].atak=false;
-                                if(odleglosc<800)
+                                if(odleglosc<600)
                                     gracz.hp-=wrog[i].dmg;
                                 tekst(pozycja.x,pozycja.y,"Ugh...");
                                 mowi=klatki;
+                                strzal.play();
                             }
                         }
                         if(wrog[i].atakowany&&odleglosc<50&&klatki%gracz.aps==0)
