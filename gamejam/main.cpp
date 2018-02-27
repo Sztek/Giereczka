@@ -15,6 +15,20 @@ double skalax=ekranx/1600,skalay=ekrany/900;
 sf::RectangleShape dymek;
 sf::Text dialog;
 sf::Font fnt;
+class trofea
+{
+public:
+    sf::Texture tpc;
+    sf::Sprite pc;
+    void rysuj(int a);
+};
+void trofea::rysuj(int a)
+{
+    tpc.loadFromFile("trofki.png");
+    pc.setTexture(tpc);
+    pc.setTextureRect(sf::IntRect(a*100,0, 100,100));
+    pc.setPosition(ekranx-100*skalax,a%3*100*skalay);
+}
 class armaty
 {
 public:
@@ -108,6 +122,7 @@ public:
     sf::Texture thrth;
     sf::Sprite hrth;
     void rysuj(int i);
+    void rysujb(int i);
 };
 void Serce::rysuj(int i)
 {
@@ -115,6 +130,13 @@ void Serce::rysuj(int i)
     hrth.setTexture(thrth);
     hrth.setScale(2,2);
     hrth.setPosition(i*24+2,0);
+}
+void Serce::rysujb(int i)
+{
+    thrth.loadFromFile("hearthb.png");
+    hrth.setTexture(thrth);
+    hrth.setScale(5,5);
+    hrth.setPosition(ekranx/2+55*i*skalax-55*skalax,10);
 }
 int icel;
 class Mapa
@@ -356,12 +378,14 @@ int main()
     Mapa siatka[2304];
     boss demon;
     armaty armata[3];
+    trofea trof[3];
+    Serce bosshp[3];
     sf::Vector2i mysz,kursor;          //deklaracje
     sf::Vector2f pozycja,wall,przeciwnik,dem,kul;
     sf::Event event;
     sf::Clock clock;
     double nowyczas=0,staryczas=0,klatka=0.015f;
-    int mapka=3,klatki=0,odleglosc,punkty=0,mowi;
+    int mapka=1,klatki=0,odleglosc,punkty=0,mowi;
     double rup=0,rdown=0,rright=0,rleft=0,k=0,reup=0,redown=0,reright=0,releft=0;
     bool kolgora=false,koldol=false,kolprawo=false,kollewo=false,reached,ruch=false,uwolniony[3];
     char polozenie[2304];
@@ -372,6 +396,8 @@ int main()
     {
         if(mapka==1)
         {
+            for(int i=0;i<3;i++)
+                trof[i].rysuj(i);
             music.openFromFile("riff_7.ogg");
             music.play();
             icel=1;
@@ -426,6 +452,8 @@ int main()
         }
         if(mapka==2)
         {
+            for(int i=3;i<6;i++)
+                trof[i-3].rysuj(i);
             music.openFromFile("riff_7.ogg");
             music.play();
             icel=1;
@@ -493,6 +521,8 @@ int main()
         }
         if(mapka==3)
         {
+            for(int i=0;i<3;i++)
+                bosshp[i].rysujb(i);
             music.openFromFile("muzyka1.ogg");
             strzal.openFromFile("cannon.ogg");
             music.play();
@@ -591,6 +621,7 @@ int main()
                                 uwolniony[0]=true;
                                 tekst(pozycja.x,pozycja.y,"Zyj z honorem!  ");
                                 mowi=klatki;
+                                trof[0].pc.setTextureRect(sf::IntRect(0,100, 100,100));
                             }
                     if(pozycja.x>siatka[1859].podloga.getPosition().x&&pozycja.x<siatka[1859].podloga.getPosition().x+100)
                         if(pozycja.y+100>siatka[1859].podloga.getPosition().y&&pozycja.y<siatka[1859].podloga.getPosition().y+200)
@@ -601,6 +632,7 @@ int main()
                                 uwolniony[1]=true;
                                 tekst(pozycja.x,pozycja.y,"Zyj z honorem!  ");
                                 mowi=klatki;
+                                trof[1].pc.setTextureRect(sf::IntRect(100,100, 100,100));
                             }
                     if(pozycja.x>siatka[2156].podloga.getPosition().x&&pozycja.x<siatka[2156].podloga.getPosition().x+100)
                         if(pozycja.y+100>siatka[2156].podloga.getPosition().y&&pozycja.y<siatka[2156].podloga.getPosition().y+200)
@@ -611,6 +643,7 @@ int main()
                                 uwolniony[2]=true;
                                 tekst(pozycja.x,pozycja.y,"Zyj z honorem!  ");
                                 mowi=klatki;
+                                trof[2].pc.setTextureRect(sf::IntRect(200,100, 100,100));
                             }
                 }
                 if(mapka==2)
@@ -621,6 +654,7 @@ int main()
                             {
                                 punkty++;
                                 uwolniony[0]=true;
+                                trof[0].pc.setTextureRect(sf::IntRect(300,100, 100,100));
                             }
                     if(pozycja.x>siatka[326].podloga.getPosition().x&&pozycja.x<siatka[326].podloga.getPosition().x+100)
                         if(pozycja.y+100>siatka[326].podloga.getPosition().y&&pozycja.y<siatka[326].podloga.getPosition().y+200)
@@ -628,6 +662,7 @@ int main()
                             {
                                 punkty++;
                                 uwolniony[1]=true;
+                                trof[1].pc.setTextureRect(sf::IntRect(400,100, 100,100));
                             }
                     if(pozycja.x>siatka[1276].podloga.getPosition().x&&pozycja.x<siatka[1276].podloga.getPosition().x+100)
                         if(pozycja.y+100>siatka[1276].podloga.getPosition().y&&pozycja.y<siatka[1276].podloga.getPosition().y+200)
@@ -957,7 +992,7 @@ int main()
             if(demon.rright==true)
                 demon.pc.move(-3*skalax,0);
 
-            if(dem.y<pozycja.y&&dem.y+150>pozycja.y&&dem.x+100>pozycja.x&&dem.x-100<pozycja.x)
+            if(dem.y-110<=pozycja.y&&dem.y+200>=pozycja.y&&dem.x+100>=pozycja.x&&dem.x-100<=pozycja.x)
                 gracz.hp=0;
             }
             kul=kula.getPosition();
@@ -969,9 +1004,12 @@ int main()
                     if(wall.x+50>pozycja.x&&wall.x-50<pozycja.x&&wall.y+50>pozycja.y&&wall.y-50<pozycja.y)
                     {
                         tekst(pozycja.x,pozycja.y,"Ognia!");
-                        mowi=klatki-80;
                         if(!armata[i].work||kul.y<0||kul.x<0||kul.y>2200*skalay)
+                        {
+                            mowi=klatki;
                             kula.setPosition(wall.x,wall.y);
+                            strzal.play();
+                        }
                         armata[0].work=false;
                         armata[1].work=false;
                         armata[2].work=false;
@@ -1007,20 +1045,25 @@ int main()
                     okno.draw(wrog[i].pc);
             if(gracz.hp>0)
                 okno.draw(gracz.pc);
-            for(int i=0; i<gracz.hp; i++)
-                okno.draw(zycie[i].hrth);
             if(mapka==3)
             {
                 for(int i=0;i<3;i++)
                     okno.draw(armata[i].pc);
                 okno.draw(demon.pc);
                 okno.draw(kula);
+                for(int i=0; i<demon.hp; i++)
+                    okno.draw(bosshp[i].hrth);
             }
+
             if(klatki-mowi<90)
             {
                 okno.draw(dymek);
                 okno.draw(dialog);
             }
+            for(int i=0; i<gracz.hp; i++)
+                okno.draw(zycie[i].hrth);
+            for(int i=0;i<3;i++)
+                okno.draw(trof[i].pc);
             okno.display();
             if(gracz.hp<=0)
             {
