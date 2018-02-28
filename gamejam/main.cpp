@@ -391,20 +391,40 @@ int main()
     sf::Event event;
     sf::Clock clock;
     double nowyczas=0,staryczas=0,klatka=0.015f;
-    int mapka=3,klatki=0,odleglosc,punkty=0,mowi,wybuch=0;
+    int mapka=1,klatki=0,odleglosc,punkty=0,mowi,wybuch=0,strt=0;
     double rup=0,rdown=0,rright=0,rleft=0,k=0,reup=0,redown=0,reright=0,releft=0;
     bool kolgora=false,koldol=false,kolprawo=false,kollewo=false,reached,ruch=false,uwolniony[3];
     char polozenie[2304];
     static int rk=10;//ruch kamery
     gracz.rysuj(0,0);
     Serce zycie[gracz.hp];
+    sf::Texture tstart;
+    sf::Sprite start;
+    start.setScale(skalax,skalay);
+    tstart.loadFromFile("instrukcja.png");
+    while(strt<2&&okno.isOpen())
+    {
+        start.setTexture(tstart);
+        okno.clear(sf::Color::Black);
+        okno.draw(start);
+        okno.display();
+        if(strt==1)
+            tstart.loadFromFile("historia.png");
+        while(okno.pollEvent(event))
+            {
+                if(event.type==sf::Event::MouseButtonPressed&&event.mouseButton.button==sf::Mouse::Left)
+                    strt++;
+            }
+    }
     while(mapka<=3)
     {
+        if(punkty>=3)
+            mapka++;
         if(mapka==1)
         {
             for(int i=0;i<3;i++)
                 trof[i].rysuj(i);
-            music.openFromFile("riff_7.ogg");
+            music.openFromFile("muzyka1.ogg");
             music.play();
             icel=1;
             punkty=0;
@@ -453,14 +473,14 @@ int main()
             wrog[24].napoleon(27,18);
             for(int i=0; i<gracz.hp; i++)
                 zycie[i].rysuj(i);
-            music.openFromFile("riff_6.ogg");
-            music.play();
+            tekst(300,200,"No to w droge! ");
+            mowi=100;
         }
         if(mapka==2)
         {
             for(int i=3;i<6;i++)
                 trof[i-3].rysuj(i);
-            music.openFromFile("riff_7.ogg");
+            music.openFromFile("muzyka2.ogg");
             music.play();
             icel=1;
             punkty=0;
@@ -513,7 +533,7 @@ int main()
             wrog[20].napoleon(43,16);
             wrog[21].napoleon(34,10);
             wrog[22].napoleon(34,32);
-            wrog[23].napoleon(22,21);
+            wrog[23].napoleon(29,26);
             wrog[24].napoleon(30,18);
             for(int i=0; i<gracz.hp; i++)
                 zycie[i].rysuj(i);
@@ -522,14 +542,12 @@ int main()
             gracz.pc.move(-1200,0);
             for(int i=0; i<25; i++)
                 wrog[i].pc.move(-1200,0);
-            music.openFromFile("riff_8.ogg");
-            music.play();
         }
         if(mapka==3)
         {
             for(int i=0;i<3;i++)
                 bosshp[i].rysujb(i);
-            music.openFromFile("muzyka1.ogg");
+            music.openFromFile("muzyka3.ogg");
             strzal.openFromFile("cannon.ogg");
             music.play();
             icel=1;
@@ -557,6 +575,31 @@ int main()
             armata[2].rysuj(15,2,2);
             armata[1].rysuj(7,20,1);
             armata[0].rysuj(20,15,0);
+            wrog[0].napoleon(-300,-300);
+            wrog[1].napoleon(-300,-300);
+            wrog[2].napoleon(-300,-300);
+            wrog[3].napoleon(-300,-300);
+            wrog[4].napoleon(-300,-300);
+            wrog[5].napoleon(-300,-300);
+            wrog[6].napoleon(-300,-300);
+            wrog[7].napoleon(-300,-300);
+            wrog[8].napoleon(-300,-300);
+            wrog[9].napoleon(-300,-300);
+            wrog[10].napoleon(-300,-300);
+            wrog[11].napoleon(-300,-300);
+            wrog[12].napoleon(-300,-300);
+            wrog[13].napoleon(-300,-300);
+            wrog[14].napoleon(-300,-300);
+            wrog[15].napoleon(-300,-300);
+            wrog[16].napoleon(-300,-300);
+            wrog[17].napoleon(-300,-300);
+            wrog[18].napoleon(-300,-300);
+            wrog[19].napoleon(-300,-300);
+            wrog[20].napoleon(-300,-300);
+            wrog[21].napoleon(-300,-300);
+            wrog[22].napoleon(-300,-300);
+            wrog[23].napoleon(-300,-300);
+            wrog[24].napoleon(-300,-300);
             tkula.loadFromFile("kula.png");
             kula.setTexture(tkula);
             kula.setOrigin(12,12);
@@ -582,6 +625,10 @@ int main()
                     okno.close();
                     mapka=4;
                     return 0;
+                }
+                if(sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+                {
+                    gracz.hp=0;
                 }
                 if(event.type==sf::Event::MouseButtonPressed&&event.mouseButton.button==sf::Mouse::Left)
                     ruch=true;
@@ -678,8 +725,7 @@ int main()
                                 uwolniony[2]=true;
                             }
                 }
-                if(punkty>=3)
-                    mapka++;
+
                 for(int i=0; i<25; i++)
                     if(wrog[i].hp>0)
                     {
@@ -708,29 +754,6 @@ int main()
                                         wrog[i].kollewo=true;
                                 }
                             }
-
-                        //if(odleglosc<600*skalax*skalay)
-                        /*for(int j=0; j<2304; j++)
-                            for(int o=0; o<=odleglosc; o+=100)
-                                if(siatka[j].sciana==true)
-                                {
-                                    wall=siatka[j].podloga.getPosition();
-                                    if(wall.x+140*skalax>=przeciwnik.x&&wall.x-40*skalax<przeciwnik.x)
-                                    {
-                                        if(wall.y+140*skalay>=przeciwnik.y-(o*skalay)&&wall.y-50*skalay<przeciwnik.y-(o*skalay))
-                                            wrog[i].widzi=false;
-                                        if(wall.y+50>=przeciwnik.y+(o*skalay)&&wall.y-55*skalay<=przeciwnik.y+(o*skalay))
-                                            wrog[i].widzi=false;
-                                    }
-                                    if(wall.y-50*skalay<przeciwnik.y&&wall.y+150*skalay>przeciwnik.y)
-                                    {
-                                        if(wall.x+130*skalax>=przeciwnik.x+(o*skalax)&&wall.x<=przeciwnik.x+(o*skalax))
-                                            wrog[i].widzi=false;
-                                        if(wall.x>=przeciwnik.x-(o*skalax)&&wall.x+30*skalax<przeciwnik.x-(o*skalax))
-                                            wrog[i].widzi=false;
-                                    }
-                                }*/
-
                         if(odleglosc<400*skalax*skalay&&wrog[i].widzi&&!wrog[i].atak)
                         {
                             if(odleglosc>300*skalax*skalay)
@@ -840,6 +863,7 @@ int main()
                         for(int i=0;i<3;i++)
                             armata[i].pc.move(0,rk);
                         kula.move(0,rk);
+                        boom.move(0,rk);
                     }
                     dymek.move(0,rk);
                     dialog.move(0,rk);
@@ -857,6 +881,7 @@ int main()
                         for(int i=0;i<3;i++)
                             armata[i].pc.move(0,-rk);
                         kula.move(0,-rk);
+                        boom.move(0,-rk);
                     }
                     dymek.move(0,-rk);
                     dialog.move(0,-rk);
@@ -874,6 +899,7 @@ int main()
                         for(int i=0;i<3;i++)
                             armata[i].pc.move(rk,0);
                         kula.move(rk,0);
+                        boom.move(rk,0);
                     }
                     dymek.move(rk,0);
                     dialog.move(rk,0);
@@ -891,6 +917,7 @@ int main()
                         for(int i=0;i<3;i++)
                             armata[i].pc.move(-rk,0);
                         kula.move(-rk,0);
+                        boom.move(-rk,0);
                     }
                     dymek.move(-rk,0);
                     dialog.move(-rk,0);
@@ -1088,9 +1115,29 @@ int main()
             {
                 Sleep(1000);
                 punkty=3;
+                mapka--;
             }
-            if(demon.hp<=0&&klatki-wybuch>359)
-                return 0;
+            if(mapka==3)
+                while(demon.hp<=0&&klatki-wybuch>359)
+                {
+                    sf::Texture tend;
+                    sf::Sprite ending;
+                    tend.loadFromFile("koniec.png");
+                    ending.setTexture(tend);
+                    ending.setScale(skalax,skalay);
+                    okno.clear(sf::Color::Black);
+                    okno.draw(ending);
+                    okno.display();
+                    if(klatki-wybuch>600)
+                        return 0;
+                    while(okno.pollEvent(event))
+                        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+                        {
+                            okno.close();
+                            mapka=4;
+                            return 0;
+                        }
+                }
         }
     }
     return 0;
