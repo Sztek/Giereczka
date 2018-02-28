@@ -314,6 +314,16 @@ void Mapa::rysuj(int x,int y,char t)
         podloga.setTextureRect(sf::IntRect(0,0, 100,100));
         sciana=true;
         break;
+    case 'S':
+        tpodloga.loadFromFile("skrzynia.png");
+        podloga.setTextureRect(sf::IntRect(0,0, 100,100));
+        sciana=true;
+        break;
+    case ':':
+        tpodloga.loadFromFile("plyty.png");
+        podloga.setTextureRect(sf::IntRect(0,0, 100,100));
+        sciana=true;
+        break;
     default:
         tpodloga.loadFromFile("");
         sciana=false;
@@ -452,7 +462,7 @@ int main()
             wrog[3].napoleon(11,31);
             wrog[4].napoleon(60,12);
             wrog[5].napoleon(57,12);
-            wrog[6].napoleon(61,11);
+            wrog[6].napoleon(59,11);
             wrog[7].napoleon(9,12);
             wrog[8].napoleon(7,11);
             wrog[9].napoleon(16,17);
@@ -473,7 +483,7 @@ int main()
             wrog[24].napoleon(27,18);
             for(int i=0; i<gracz.hp; i++)
                 zycie[i].rysuj(i);
-            tekst(300,200,"No to w droge! ");
+            tekst(300*skalax,200*skalay,"No to w droge! ");
             mowi=100;
         }
         if(mapka==2)
@@ -542,6 +552,8 @@ int main()
             gracz.pc.move(-1200,0);
             for(int i=0; i<25; i++)
                 wrog[i].pc.move(-1200,0);
+            tekst(900*skalax,200*skalay,"Musze dostac sie do zamku, ale najpierw powinienem zdobyc plany armat. ");
+            mowi=klatki+500;
         }
         if(mapka==3)
         {
@@ -715,6 +727,7 @@ int main()
                             {
                                 punkty++;
                                 uwolniony[1]=true;
+                                siatka[326].podloga.setTextureRect(sf::IntRect(100,0, 100,100));
                                 trof[1].pc.setTextureRect(sf::IntRect(400,100, 100,100));
                             }
                     if(pozycja.x>siatka[1276].podloga.getPosition().x&&pozycja.x<siatka[1276].podloga.getPosition().x+100)
@@ -930,7 +943,7 @@ int main()
                         {
                             if(wall.y+110*skalay>=pozycja.y&&wall.y<=pozycja.y)
                                 kolgora=true;
-                            if(wall.y>=pozycja.y&&wall.y<=pozycja.y+5)
+                            if(wall.y>=pozycja.y-10&&wall.y<=pozycja.y+5)
                                 koldol=true;
                         }
                         if(wall.y<=pozycja.y&&wall.y+100*skalay>=pozycja.y)
@@ -1107,7 +1120,8 @@ int main()
             for(int i=0; i<gracz.hp; i++)
                 okno.draw(zycie[i].hrth);
             for(int i=0;i<3;i++)
-                okno.draw(trof[i].pc);
+                if(mapka<3)
+                    okno.draw(trof[i].pc);
             if(demon.hp<=0&&klatki-wybuch<60)
                 okno.draw(boom);
             okno.display();
