@@ -363,8 +363,14 @@ int main()
     loading.setPosition(ekranx-200,ekrany-150);
     sf::Texture tkula;
     sf::Sprite kula;
+    sf::Texture tboom;
+    sf::Sprite boom;
     sf::Texture tmap;
     sf::Sprite smap;
+    tboom.loadFromFile("boom.png");
+    boom.setTexture(tboom);
+    boom.setOrigin(200,200);
+    boom.setScale(0.01,0.01);
     tmap.loadFromFile("loadingscreen.png");
     smap.setTexture(tmap);
     smap.setScale(skalax,skalay);
@@ -385,7 +391,7 @@ int main()
     sf::Event event;
     sf::Clock clock;
     double nowyczas=0,staryczas=0,klatka=0.015f;
-    int mapka=1,klatki=0,odleglosc,punkty=0,mowi;
+    int mapka=3,klatki=0,odleglosc,punkty=0,mowi,wybuch=0;
     double rup=0,rdown=0,rright=0,rleft=0,k=0,reup=0,redown=0,reright=0,releft=0;
     bool kolgora=false,koldol=false,kolprawo=false,kollewo=false,reached,ruch=false,uwolniony[3];
     char polozenie[2304];
@@ -534,7 +540,7 @@ int main()
             std::fstream plik("mapa3.txt",std::ios::in);
             plik.read(polozenie,2304);
             procenty=0;
-            tmap.loadFromFile("loadingscreen.png");
+            tmap.loadFromFile("loadingscreen2.png");
             for(int i=0; i<64; i++)
                 for(int j=0; j<36; j++)
                 {
@@ -995,6 +1001,10 @@ int main()
             if(dem.y-110<=pozycja.y&&dem.y+200>=pozycja.y&&dem.x+100>=pozycja.x&&dem.x-100<=pozycja.x)
                 gracz.hp=0;
             }
+            else
+            {
+                boom.setScale((wybuch-klatki)*0.01,(wybuch-klatki)*0.01);
+            }
             kul=kula.getPosition();
 
                 for(int i=0;i<3;i++)
@@ -1026,11 +1036,18 @@ int main()
                 if(dem.y<kul.y&&dem.y+150>kul.y&&dem.x+100>kul.x&&dem.x-100<kul.x)
                 {
                     demon.hp-=1;
-                    kula.setPosition(-30,-30);
+                    if(!demon.hp>0)
+                    {
+                        wybuch=klatki;
+                        boom.setPosition(dem.x,dem.y);
+                    }
+                    kula.setPosition(-3000,-3000);
                     for(int i=0;i<3;i++)
                         if(armata[i].work)
                             armata[i].used=true;
                 }
+                if(demon.hp<=0&&klatki-wybuch>59)
+                    demon.pc.setTextureRect(sf::IntRect(800,0, 200,200));
             }
             kolgora=false;
             koldol=false;
@@ -1064,12 +1081,16 @@ int main()
                 okno.draw(zycie[i].hrth);
             for(int i=0;i<3;i++)
                 okno.draw(trof[i].pc);
+            if(demon.hp<=0&&klatki-wybuch<60)
+                okno.draw(boom);
             okno.display();
             if(gracz.hp<=0)
             {
                 Sleep(1000);
                 punkty=3;
             }
+            if(demon.hp<=0&&klatki-wybuch>359)
+                return 0;
         }
     }
     return 0;
