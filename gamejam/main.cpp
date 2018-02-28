@@ -411,14 +411,16 @@ int main()
     sf::Texture tstart;
     sf::Sprite start;
     start.setScale(skalax,skalay);
-    tstart.loadFromFile("instrukcja.png");
-    while(strt<2&&okno.isOpen())
+    tstart.loadFromFile("title.png");
+    while(strt<3&&okno.isOpen())
     {
         start.setTexture(tstart);
         okno.clear(sf::Color::Black);
         okno.draw(start);
         okno.display();
         if(strt==1)
+            tstart.loadFromFile("instrukcja.png");
+        if(strt==2)
             tstart.loadFromFile("historia.png");
         while(okno.pollEvent(event))
             {
@@ -483,7 +485,7 @@ int main()
             wrog[24].napoleon(27,18);
             for(int i=0; i<gracz.hp; i++)
                 zycie[i].rysuj(i);
-            tekst(300*skalax,200*skalay,"No to w droge! ");
+            tekst(300*skalax,200*skalay,"Musze ocalic mych braci ");
             mowi=100;
         }
         if(mapka==2)
@@ -582,8 +584,8 @@ int main()
                     okno.draw(loading);
                     okno.display();
                 }
-            gracz.rysuj(3,2);
-            demon.rysuj(7,7);
+            gracz.rysuj(3,11);
+            demon.rysuj(11,11);
             armata[2].rysuj(15,2,2);
             armata[1].rysuj(7,20,1);
             armata[0].rysuj(20,15,0);
@@ -612,6 +614,12 @@ int main()
             wrog[22].napoleon(-300,-300);
             wrog[23].napoleon(-300,-300);
             wrog[24].napoleon(-300,-300);
+            for(int i=0; i<2304; i++)
+                siatka[i].podloga.move(0,-800);
+            gracz.pc.move(0,-800);
+            demon.pc.move(0,-800);
+            for(int i=0;i<3;i++)
+                armata[i].pc.move(0,-800);
             tkula.loadFromFile("kula.png");
             kula.setTexture(tkula);
             kula.setOrigin(12,12);
@@ -720,6 +728,8 @@ int main()
                                 punkty++;
                                 uwolniony[0]=true;
                                 trof[0].pc.setTextureRect(sf::IntRect(300,100, 100,100));
+                                tekst(pozycja.x,pozycja.y-100*skalay,"Masz klucz do zamku, ocal nas przed demonem.  ");
+                                mowi=klatki+500;
                             }
                     if(pozycja.x>siatka[326].podloga.getPosition().x&&pozycja.x<siatka[326].podloga.getPosition().x+100)
                         if(pozycja.y+100>siatka[326].podloga.getPosition().y&&pozycja.y<siatka[326].podloga.getPosition().y+200)
